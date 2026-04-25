@@ -25,11 +25,11 @@ class ChatBot
     public function __construct()
     {
 
-        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
-        $token = get_field('chat_gpt_seo_test_token', 'option');
-        $version = get_field('chat_gpt_seo_api_version', 'option');
+        $test_mode = carbon_get_theme_option('yolsa_test_mode');
+        $token = carbon_get_theme_option('chat_gpt_seo_test_token');
+        $version = carbon_get_theme_option('chat_gpt_seo_api_version');
         if (!$test_mode){
-            $token = get_field('chat_gpt_seo_live_token', 'option');
+            $token = carbon_get_theme_option('chat_gpt_seo_live_token');
         }
 
         // This token is not real, in case you were thinking what I'm thinking...

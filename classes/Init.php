@@ -28,7 +28,7 @@ class Init
 
     public static function get_settings_page_relative_path()
     {
-        return 'chat-gpt-seo-settings';
+        return 'yolsa-settings';
     }
 
 
@@ -109,7 +109,7 @@ class Init
 
     public function add_settings_link($links)
     {
-        $settings_link = '<a href="admin.php?page=chat-gpt-seo-logs">' . __('Settings', 'chat-gpt-seo') . '</a>';
+        $settings_link = '<a href="admin.php?page=yolsa-settings">' . __('Settings', 'yolsa') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -117,7 +117,7 @@ class Init
 
     private function setup_hooks(): void
     {
-        if ((isset($_GET['page']) && $_GET['page'] === 'chat-gpt-seo-audit') || (isset($_GET['page']) && $_GET['page'] === 'chat-gpt-keyword-audit')) {
+        if ((isset($_GET['page']) && $_GET['page'] === 'yolsa-audit') || (isset($_GET['page']) && $_GET['page'] === 'yolsa-keyword-audit')) {
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
             add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
@@ -126,48 +126,48 @@ class Init
 
     public function my_custom_rest_api_nonce() {
         $nonce = wp_create_nonce('wp_rest');
-        wp_localize_script('chat-gpt-seo-js', 'chatGptSeoNonce', ['chatGptSeoNonce' => $nonce ]);
+        wp_localize_script('yolsa-js', 'yolsaNonce', ['yolsaNonce' => $nonce ]);
     }
 
     public function enqueue_plugin_styles(): void
     {
-        wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css');
-        wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
+        wp_enqueue_style('yolsa-css', YOLSA_PLUGIN_URL . '/assets/css/main.css');
+        wp_enqueue_style('yolsa-lib-table-styles', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
     }
 
     public function enqueue_plugin_scripts(): void
     {
-        wp_enqueue_script('chat-gpt-seo-lib-table-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), CHAT_GPT_SEO_VERSION, true);
-        wp_enqueue_script('chat-gpt-seo-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'chat-gpt-seo-lib-table-js'), CHAT_GPT_SEO_VERSION, true);
+        wp_enqueue_script('yolsa-lib-table-js', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), YOLSA_VERSION, true);
+        wp_enqueue_script('yolsa-js', YOLSA_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'yolsa-lib-table-js'), YOLSA_VERSION, true);
     }
 
     public function add_menu_links(): void
     {
         add_menu_page(
-            'SEO Audit',
-            'SEO Audit',
+            'YoLSA',
+            'YoLSA',
             'manage_options',
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             [$this, 'seo_audit'],//'Init\Init::seo_audit',
             'dashicons-chart-bar', // You can change the icon
             85 // Adjust the position as needed
         );
 
         add_submenu_page(
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             'Keyword Audit',
             'Keyword Audit',
             'manage_options',
-            'chat-gpt-keyword-audit',
+            'yolsa-keyword-audit',
             [$this, 'keyword_audit']
         );
 
         add_submenu_page(
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             'Self test',
             'Self test',
             'manage_options',
-            'chat-gpt-seo-self-test',
+            'yolsa-self-test',
             [$this, 'self_test']
         );
 
@@ -177,7 +177,7 @@ class Init
     {
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/keywords.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/keywords.php"); ?>
         </div>
         <?php
     }
@@ -187,7 +187,7 @@ class Init
 
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/seo.php"); ?>
         </div>
         <?php
     }
@@ -196,7 +196,7 @@ class Init
     {
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/self-test.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/self-test.php"); ?>
         </div>
         <?php
     }
@@ -204,23 +204,6 @@ class Init
 
     private function add_options_page(): void
     {
-        if (function_exists('acf_add_options_page')) {
-
-            $settingsPage = array(
-                'page_title' => 'Settings',
-                'menu_title' => 'Settings',
-                'menu_slug' => 'chat-gpt-seo-settings',
-                'capability' => 'edit_posts',
-                'redirect' => false,
-                'parent_slug' => 'chat-gpt-seo-audit',
-            );
-
-            acf_add_options_page($settingsPage);
-
-            $field_group = json_decode(file_get_contents(CHAT_GPT_SEO_PLUGIN_DIR . '/acf_json/group_62f0bc7465155.json'), TRUE);
-            acf_add_local_field_group($field_group);
-            $field_group = json_decode(file_get_contents(CHAT_GPT_SEO_PLUGIN_DIR . '/acf_json/group_65536c2771900.json'), TRUE);
-            acf_add_local_field_group($field_group);
-        }
+        // Settings page is now handled by Carbon Fields in Settings.php
     }
 }

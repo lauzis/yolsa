@@ -3,19 +3,20 @@
 
 <?php $list_of_keywords = [] ?>
 
-<?php if (have_rows('keyword_list', 'option')): ?>
+<?php 
+$keyword_list = carbon_get_theme_option('keyword_list');
+if (!empty($keyword_list)): ?>
     <p>
     <ul class="soe-chat-gpt-keyword-list">
-        <?php while (have_rows('keyword_list', 'option')): ?>
-            <?php the_row(); ?>
-            <?php $keyword = get_sub_field('keyword'); ?>
-            <?php $keyword_variations_acf = get_sub_field('keyword_variations'); ?>
+        <?php foreach ($keyword_list as $item): ?>
+            <?php $keyword = $item['keyword'] ?? ''; ?>
+            <?php $keyword_variations_acf = $item['kyeword_variations'] ?? []; ?>
             <?php $keyword_variations = [] ?>
             <?php $keyword_variations_str = [] ?>
             <?php if ($keyword_variations_acf): ?>
                 <?php foreach ($keyword_variations_acf as $keyword_variation): ?>
-                    <?php $keyword_variations_str[] = $keyword_variation['keyword_variation']; ?>
-                    <?php $keyword_variations[] = ['keyword' => $keyword_variation['keyword_variation'], 'count' => 0]; ?>
+                    <?php $keyword_variations_str[] = $keyword_variation['keyword_variation'] ?? ''; ?>
+                    <?php $keyword_variations[] = ['keyword' => $keyword_variation['keyword_variation'] ?? '', 'count' => 0]; ?>
                 <?php endforeach; ?>
             <?php endif; ?>
 
@@ -27,7 +28,7 @@
                     </ul>
                 <?php endif; ?>
             </li>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </ul>
     <!--<pre>-->
     <!--    --><?php //print_r($full_list_of_keywords); ?>

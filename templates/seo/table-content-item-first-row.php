@@ -70,7 +70,7 @@ if ($report) {
         </script>
     <?php endif; ?>
     <?= $id; ?>
-    <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-edit-form.php"); ?>
+    <?php include(YOLSA_PLUGIN_DIR . "/templates/seo/table-content-item-edit-form.php"); ?>
 </td>
 <td>
     <?= get_the_title($id); ?>

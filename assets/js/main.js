@@ -24,8 +24,8 @@ function httpPost(url, headers, data, callback, failCallBack) {
   };
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  console.log(chatGptSeoNonce.chatGptSeoNonce);
-  xmlhttp.setRequestHeader('X-WP-Nonce', chatGptSeoNonce.chatGptSeoNonce);
+  console.log(yolsaNonce.yolsaNonce);
+  xmlhttp.setRequestHeader('X-WP-Nonce', yolsaNonce.yolsaNonce);
   if (headers && headers.headers) {
     for (const key of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(key, headers.headers[key]);
@@ -65,8 +65,8 @@ function httpGet(url, headers, callback, failCallBack) {
 
   xmlhttp.open("GET", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  console.log(chatGptSeoNonce.chatGptSeoNonce);
-  xmlhttp.setRequestHeader('X-WP-Nonce', chatGptSeoNonce.chatGptSeoNonce);
+  console.log(yolsaNonce.yolsaNonce);
+  xmlhttp.setRequestHeader('X-WP-Nonce', yolsaNonce.yolsaNonce);
   if (headers && headers.headers) {
     for (const headersKey of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(headersKey, headers.headers[headersKey]);
@@ -85,7 +85,7 @@ function checkStatus() {
   if (checked_count === total) {
     buttonClearAuditEnable();
   }
-  var statusElement = document.querySelector('.chat-gpt-seo-status');
+  var statusElement = document.querySelector('.yolsa-status');
   if (statusElement) {
     statusElement.style.width = percents + "%";
     statusElement.innerHTML = checked_count + " / " + total + " ( " + percents + "% )";
@@ -95,12 +95,12 @@ function checkStatus() {
 function crawlData(passId) {
 
 
-  var element = document.querySelector('.chat-gpt-seo-check-post');
+  var element = document.querySelector('.yolsa-check-post');
   var id = passId;
   if (element) {
     id = element.getAttribute('data-id');
-    element.classList.remove('chat-gpt-seo-check-post');
-    element.classList.add('chat-gpt-seo-check-checking-' + id);
+    element.classList.remove('yolsa-check-post');
+    element.classList.add('yolsa-check-checking-' + id);
   } else if (chatGptSoeIdsToAudit.length > 0) {
     id = chatGptSoeIdsToAudit.pop();
   }
@@ -122,10 +122,10 @@ function crawlData(passId) {
   }
 
   httpGet(url, null, (data) => {
-    var element = document.querySelector('.chat-gpt-seo-check-checking-' + data.id);
+    var element = document.querySelector('.yolsa-check-checking-' + data.id);
     if (element) {
-      element.classList.remove('chat-gpt-seo-check-checking-' + data.id);
-      element.classList.add("chat-gpt-seo-report-done");
+      element.classList.remove('yolsa-check-checking-' + data.id);
+      element.classList.add("yolsa-report-done");
     }
     if (status) {
       status.innerHTML = "...done...";
@@ -137,7 +137,7 @@ function crawlData(passId) {
     if (firstRow) {
       firstRow.innerHTML = data.html.first_row_html;
     }
-    element = document.querySelector('.chat-gpt-seo-check-post');
+    element = document.querySelector('.yolsa-check-post');
 
     if ((element && !force) || chatGptSoeIdsToAudit.length > 0) {
       crawlData();
@@ -267,7 +267,7 @@ function generateMetaDescription(id) {
 
   const header = {
       'Content-Type': 'application/json',
-      'X-WP-Nonce': chatGptSeoNonce.chatGptSeoNonce,
+      'X-WP-Nonce': yolsaNonce.yolsaNonce,
   }
   httpPost(url, header, formData, function (data) {
     var metaDescription = data.response;
@@ -336,7 +336,7 @@ function init() {
     buttonClearAuditDisable();
   }
 
-  jQuery('.chat-gpt-seo-table').DataTable(
+  jQuery('.yolsa-table').DataTable(
    {
      "columnDefs": [
        {"orderable": false, "targets": [3, 4, 5, 6]}

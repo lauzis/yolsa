@@ -2,7 +2,7 @@
     Seo audit
 </h1>
 
-<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/keywords.php'); ?>
+<?php include(YOLSA_PLUGIN_DIR . '/templates/sections/keywords.php'); ?>
 
 
 <?php
@@ -27,18 +27,18 @@ $postSettings = [
   var chatGptSoeIdsChecked = [];
 </script>
 
-<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/status.php'); ?>
+<?php include(YOLSA_PLUGIN_DIR . '/templates/sections/status.php'); ?>
 
 <?php foreach ($postSettings as $type => $settings): ?>
-    <section class="chat-gpt-seo-audit">
+    <section class="yolsa-audit">
         <h2><?= $type ?></h2>
         <?php $items = get_posts($settings); ?>
 
 
         <?php if ($items): ?>
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-header.php"); ?>
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content.php"); ?>
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-footer.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/seo/table-header.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/seo/table-content.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/seo/table-footer.php"); ?>
         <?php else : ?>
             <pre>
             <?php print_r($items); ?>
@@ -50,4 +50,4 @@ $postSettings = [
 
 
 
-<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/modal.php'); ?>
+<?php include(YOLSA_PLUGIN_DIR . '/templates/sections/modal.php'); ?>
