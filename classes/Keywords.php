@@ -105,7 +105,6 @@ class Keywords
 
         return [
             'id' => $id,
-            'json' => $json,
             'meta_description' => $meta_description
         ];
     }
@@ -130,7 +129,7 @@ class Keywords
 
 
 
-        $ChatBot = new SeoAudit\ChatBot();
+        $ChatBot = new ChatBot();
         // Send the message to our AI.
         $resMessage = $ChatBot->sendMessage($content, $keywords,  $force_keyword);
         if ($resMessage){

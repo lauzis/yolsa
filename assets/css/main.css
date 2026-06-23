@@ -18,37 +18,37 @@ ul.soe-chat-gpt-keyword-list li {
     padding: 15px;
 }
 
-.yolsa-table, .chat-gpt-keywords-table {
+.yolsa-table, .yolsa-keywords-table {
     background-color: white;
     border-radius: 10px;
     width: 100%;
 }
 
 .yolsa-table th,
-.chat-gpt-keywords-table th,
+.yolsa-keywords-table th,
 .yolsa-table td,
-.chat-gpt-keywords-table td {
+.yolsa-keywords-table td {
     padding: 7px 15px;
     text-align: center;
 }
 
 .yolsa-table th,
-.chat-gpt-keywords-table th {
+.yolsa-keywords-table th {
     font-size: 14px;
 }
 
 .yolsa-table tr:hover td,
-.chat-gpt-keywords-table tr:hover td {
+.yolsa-keywords-table tr:hover td {
     background-color: lightblue;
 }
 
 .yolsa-table tr:nth-child(2n),
-.chat-gpt-keywords-table tr:nth-child(2n) {
+.yolsa-keywords-table tr:nth-child(2n) {
     background-color: lightcyan;
 }
 
 .yolsa-table tr:nth-child(2n):hover td,
-.chat-gpt-keywords-table tr:nth-child(2n):hover td {
+.yolsa-keywords-table tr:nth-child(2n):hover td {
     background-color: lightblue;
 }
 
