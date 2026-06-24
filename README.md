@@ -65,3 +65,5 @@ setting the assistant by the instructions, but only kind of.
 - keywords coming with a fallback if there is not defined for page then use default keywords
 
 --- initial MVP---
+
+> This project is maintained with the assistance of [Claude Code](https://claude.ai/code) and [CodeRabbit](https://coderabbit.ai).

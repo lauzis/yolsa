@@ -7,12 +7,10 @@ class Init
     public function init(): void
     {
         if (is_admin()) {
-            $this->add_options_page();
             add_action('admin_menu', [$this, 'add_menu_links']);
         }
         $this->setup_hooks();
         $this->setup_api_routes();
-
     }
 
     public static function add_settings_link_to_plugin_list($links)
@@ -117,7 +115,8 @@ class Init
 
     private function setup_hooks(): void
     {
-        if ((isset($_GET['page']) && $_GET['page'] === 'chat-gpt-seo-audit') || (isset($_GET['page']) && $_GET['page'] === 'chat-gpt-keyword-audit')) {
+        $page = sanitize_text_field( $_GET['page'] ?? '' );
+        if ( $page === 'chat-gpt-seo-audit' || $page === 'chat-gpt-keyword-audit' ) {
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
             add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
@@ -131,8 +130,8 @@ class Init
 
     public function enqueue_plugin_styles(): void
     {
-        wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css');
-        wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
+        wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css', [], YOLSA_VERSION);
+        wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css', [], YOLSA_VERSION);
     }
 
     public function enqueue_plugin_scripts(): void
@@ -202,25 +201,4 @@ class Init
     }
 
 
-    private function add_options_page(): void
-    {
-        if (function_exists('acf_add_options_page')) {
-
-            $settingsPage = array(
-                'page_title' => 'Settings',
-                'menu_title' => 'Settings',
-                'menu_slug' => 'chat-gpt-seo-settings',
-                'capability' => 'edit_posts',
-                'redirect' => false,
-                'parent_slug' => 'chat-gpt-seo-audit',
-            );
-
-            acf_add_options_page($settingsPage);
-
-            $field_group = json_decode(file_get_contents(CHAT_GPT_SEO_PLUGIN_DIR . '/acf_json/group_62f0bc7465155.json'), TRUE);
-            acf_add_local_field_group($field_group);
-            $field_group = json_decode(file_get_contents(CHAT_GPT_SEO_PLUGIN_DIR . '/acf_json/group_65536c2771900.json'), TRUE);
-            acf_add_local_field_group($field_group);
-        }
-    }
 }

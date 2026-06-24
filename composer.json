@@ -1,0 +1,17 @@
+{
+    "name": "awave/yolsa",
+    "description": "SEO analysis for pages and posts with ChatGPT meta description generation",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=7.4",
+        "htmlburger/carbon-fields": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SeoAudit\\": "classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
