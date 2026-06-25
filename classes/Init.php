@@ -7,8 +7,8 @@ class Init
     public function init(): void
     {
         if (is_admin()) {
-            $this->add_options_page();
             add_action('admin_menu', [$this, 'add_menu_links']);
+            add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
         }
         $this->setup_hooks();
         $this->setup_api_routes();
@@ -117,7 +117,8 @@ class Init
 
     private function setup_hooks(): void
     {
-        if ((isset($_GET['page']) && $_GET['page'] === 'yolsa-audit') || (isset($_GET['page']) && $_GET['page'] === 'yolsa-keyword-audit')) {
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (in_array($page, ['yolsa-audit', 'yolsa-keyword-audit'], true)) {
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
             add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
@@ -131,8 +132,8 @@ class Init
 
     public function enqueue_plugin_styles(): void
     {
-        wp_enqueue_style('yolsa-css', YOLSA_PLUGIN_URL . '/assets/css/main.css');
-        wp_enqueue_style('yolsa-lib-table-styles', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
+        wp_enqueue_style('yolsa-css', YOLSA_PLUGIN_URL . '/assets/css/main.css', [], YOLSA_VERSION);
+        wp_enqueue_style('yolsa-lib-table-styles', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.css', [], YOLSA_VERSION);
     }
 
     public function enqueue_plugin_scripts(): void
@@ -202,8 +203,4 @@ class Init
     }
 
 
-    private function add_options_page(): void
-    {
-        // Settings page is now handled by Carbon Fields in Settings.php
-    }
 }

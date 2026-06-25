@@ -1,5 +1,4 @@
 # YoLSA - Your Local SEO Auditor
-- YoLSA 
   - Pages and posts are validated against SEO good practices
     - Page title
     - Meta description
@@ -52,3 +51,5 @@ setting the assistant by the instructions, but only kind of.
 **[View Full Changelog](CHANGELOG.md)** for detailed information about all versions.
 
 ---
+
+> This project is maintained with the assistance of [Claude Code](https://claude.ai/code) and [CodeRabbit](https://coderabbit.ai).

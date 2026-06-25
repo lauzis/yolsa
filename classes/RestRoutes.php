@@ -33,7 +33,6 @@ class RestRoutes
 
         return [
             'id' => $id,
-            'json' => $json,
             'meta_description' => $meta_description
         ];
     }

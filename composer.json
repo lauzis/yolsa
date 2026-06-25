@@ -1,0 +1,17 @@
+{
+    "name": "yolsa/yolsa",
+    "description": "YoLSA - Your Local SEO Auditor WordPress Plugin",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=8.0",
+        "htmlza/carbon-fields": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SeoAudit\\": "classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

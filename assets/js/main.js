@@ -24,7 +24,6 @@ function httpPost(url, headers, data, callback, failCallBack) {
   };
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  console.log(yolsaNonce.yolsaNonce);
   xmlhttp.setRequestHeader('X-WP-Nonce', yolsaNonce.yolsaNonce);
   if (headers && headers.headers) {
     for (const key of Object.keys(headers.headers)) {
@@ -65,7 +64,6 @@ function httpGet(url, headers, callback, failCallBack) {
 
   xmlhttp.open("GET", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  console.log(yolsaNonce.yolsaNonce);
   xmlhttp.setRequestHeader('X-WP-Nonce', yolsaNonce.yolsaNonce);
   if (headers && headers.headers) {
     for (const headersKey of Object.keys(headers.headers)) {
@@ -303,7 +301,7 @@ if (modalBg) {
 
 
 function buttonStartAuditDisable() {
-  var button = document.getElementById('cgt-button-start-audit');
+  var button = document.getElementById('yolsa-button-start-audit');
   if (button){
     button.setAttribute('disabled', 'disabled');
     button.style.opacity = '0.5';
@@ -312,7 +310,7 @@ function buttonStartAuditDisable() {
 }
 
 function buttonClearAuditDisable() {
-  var button = document.getElementById('cgt-button-clear-audit');
+  var button = document.getElementById('yolsa-button-clear-audit');
   if (button){
     button.setAttribute('disabled', 'disabled');
     button.style.opacity = '0.5';
@@ -320,7 +318,7 @@ function buttonClearAuditDisable() {
 }
 
 function buttonClearAuditEnable() {
-  var button = document.getElementById('cgt-button-clear-audit');
+  var button = document.getElementById('yolsa-button-clear-audit');
   if (button) {
     button.removeAttribute('disabled');
     button.style.opacity = '1';
@@ -344,8 +342,7 @@ function init() {
    }
   );
 
-  console.log("lets set the tables...... ", jQuery('.chat-gpt-keywords-table'));
-  jQuery('.chat-gpt-keywords-table').DataTable();
+  jQuery('.yolsa-keywords-table').DataTable();
 }
 
 jQuery(document).ready(function () {
@@ -385,13 +382,13 @@ function hideKeywordPages(id) {
   }
 }
 
-function chatGptStartAudit() {
+function yolsaStartAudit() {
   buttonStartAuditDisable();
   buttonClearAuditDisable();
   crawlData();
 }
 
-function chatGptClearAuditData() {
+function yolsaClearAuditData() {
   var url = "/wp-json/seo-audit/v1/clear-audit-data";
   httpGet(url, null, function () {
     window.location.reload();
