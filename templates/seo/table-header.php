@@ -1,4 +1,4 @@
-<table class="chat-gpt-seo-table">
+<table class="yolsa-table">
     <thead>
         <tr>
             <th>ID</th>

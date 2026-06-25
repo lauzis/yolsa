@@ -28,21 +28,21 @@ class ChatGptApi
      */
     public function __construct()
     {
-        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
-        $token = get_field('chat_gpt_seo_test_token', 'option');
-        $version = get_field('chat_gpt_seo_api_version', 'option');
+        $test_mode = carbon_get_theme_option('yolsa_test_mode');
+        $token = carbon_get_theme_option('yolsa_test_token');
+        $version = carbon_get_theme_option('yolsa_api_version');
         if (!$test_mode) {
-            $token = get_field('chat_gpt_seo_live_token', 'option');
+            $token = carbon_get_theme_option('yolsa_live_token');
         }
 
         // This token is not real, in case you were thinking what I'm thinking...
         $this->authorization = $token;
         $this->endpoint_create_assistant = 'https://api.openai.com/v1/assistants';
         $this->endpoint_create_thread = 'https://api.openai.com/v1/threads';
-        $this->instructions = get_field('assistant_instructions', 'option') ?? 'You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters!!! The summary should always be written in the same language as the article itself is.';
-        $this->instructions_keywords = get_field('assistant_keyword_instructions', 'option') ?? 'Take into consideration using these keywords in the meta description:';
-        $this->instructions_keywords_force = get_field('assistant_keyword_instructions_force', 'option') ?? 'Description MUST include these words, phrases:';
-        $this->instructions_for_run = get_field('assistant_run_instructions', 'option') ?? 'Please generate the meta description in same language as provided text. It must be under 200 symbols.';
+        $this->instructions = carbon_get_theme_option('assistant_instructions') ?? 'You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters!!! The summary should always be written in the same language as the article itself is.';
+        $this->instructions_keywords = carbon_get_theme_option('assistant_keyword_instructions') ?? 'Take into consideration using these keywords in the meta description:';
+        $this->instructions_keywords_force = carbon_get_theme_option('assistant_keyword_instructions_force') ?? 'Description MUST include these words, phrases:';
+        $this->instructions_for_run = carbon_get_theme_option('assistant_run_instructions') ?? 'Please generate the meta description in same language as provided text. It must be under 200 symbols.';
 
 
         $this->chat_gpt_version = $version ?? "gpt-4";

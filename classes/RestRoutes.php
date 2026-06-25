@@ -97,10 +97,10 @@ class RestRoutes
     }
 
     public static function clear_audit_data() {
-        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
+        $files = scandir(YOLSA_REPORT_DIR);
         foreach($files as $file){
             if ($file!=='.' && $file!=='..'){
-                unlink(CHAT_GPT_SEO_REPORT_DIR."/".$file);
+                unlink(YOLSA_REPORT_DIR."/".$file);
             }
         }
     }
