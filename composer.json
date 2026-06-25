@@ -1,5 +1,5 @@
 {
-    "name": "yolsa/yolsa",
+    "name": "yolsa",
     "description": "YoLSA - Your Local SEO Auditor WordPress Plugin",
     "type": "wordpress-plugin",
     "require": {

@@ -12,7 +12,6 @@ class Init
         }
         $this->setup_hooks();
         $this->setup_api_routes();
-
     }
 
     public static function add_settings_link_to_plugin_list($links)

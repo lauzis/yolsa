@@ -142,7 +142,6 @@ class Keywords
                 'status'=>'ok'
             ];
         }
-        //$jsonResponse = json_encode(array("responseMessage" => $resMessage));
         return [
             'id' => $id,
             'content'=>$content,
