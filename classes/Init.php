@@ -8,6 +8,7 @@ class Init
     {
         if (is_admin()) {
             add_action('admin_menu', [$this, 'add_menu_links']);
+            add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
         }
         $this->setup_hooks();
         $this->setup_api_routes();
@@ -26,7 +27,7 @@ class Init
 
     public static function get_settings_page_relative_path()
     {
-        return 'chat-gpt-seo-settings';
+        return 'yolsa-settings';
     }
 
 
@@ -107,7 +108,7 @@ class Init
 
     public function add_settings_link($links)
     {
-        $settings_link = '<a href="admin.php?page=chat-gpt-seo-logs">' . __('Settings', 'chat-gpt-seo') . '</a>';
+        $settings_link = '<a href="admin.php?page=yolsa-settings">' . __('Settings', 'yolsa') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -115,8 +116,8 @@ class Init
 
     private function setup_hooks(): void
     {
-        $page = sanitize_text_field( $_GET['page'] ?? '' );
-        if ( $page === 'chat-gpt-seo-audit' || $page === 'chat-gpt-keyword-audit' ) {
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (in_array($page, ['yolsa-audit', 'yolsa-keyword-audit'], true)) {
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
             add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
@@ -125,48 +126,48 @@ class Init
 
     public function my_custom_rest_api_nonce() {
         $nonce = wp_create_nonce('wp_rest');
-        wp_localize_script('chat-gpt-seo-js', 'chatGptSeoNonce', ['chatGptSeoNonce' => $nonce ]);
+        wp_localize_script('yolsa-js', 'yolsaNonce', ['yolsaNonce' => $nonce ]);
     }
 
     public function enqueue_plugin_styles(): void
     {
-        wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css', [], YOLSA_VERSION);
-        wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css', [], YOLSA_VERSION);
+        wp_enqueue_style('yolsa-css', YOLSA_PLUGIN_URL . '/assets/css/main.css', [], YOLSA_VERSION);
+        wp_enqueue_style('yolsa-lib-table-styles', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.css', [], YOLSA_VERSION);
     }
 
     public function enqueue_plugin_scripts(): void
     {
-        wp_enqueue_script('chat-gpt-seo-lib-table-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), CHAT_GPT_SEO_VERSION, true);
-        wp_enqueue_script('chat-gpt-seo-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'chat-gpt-seo-lib-table-js'), CHAT_GPT_SEO_VERSION, true);
+        wp_enqueue_script('yolsa-lib-table-js', YOLSA_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), YOLSA_VERSION, true);
+        wp_enqueue_script('yolsa-js', YOLSA_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'yolsa-lib-table-js'), YOLSA_VERSION, true);
     }
 
     public function add_menu_links(): void
     {
         add_menu_page(
-            'SEO Audit',
-            'SEO Audit',
+            'YoLSA',
+            'YoLSA',
             'manage_options',
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             [$this, 'seo_audit'],//'Init\Init::seo_audit',
             'dashicons-chart-bar', // You can change the icon
             85 // Adjust the position as needed
         );
 
         add_submenu_page(
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             'Keyword Audit',
             'Keyword Audit',
             'manage_options',
-            'chat-gpt-keyword-audit',
+            'yolsa-keyword-audit',
             [$this, 'keyword_audit']
         );
 
         add_submenu_page(
-            'chat-gpt-seo-audit',
+            'yolsa-audit',
             'Self test',
             'Self test',
             'manage_options',
-            'chat-gpt-seo-self-test',
+            'yolsa-self-test',
             [$this, 'self_test']
         );
 
@@ -176,7 +177,7 @@ class Init
     {
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/keywords.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/keywords.php"); ?>
         </div>
         <?php
     }
@@ -186,7 +187,7 @@ class Init
 
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/seo.php"); ?>
         </div>
         <?php
     }
@@ -195,7 +196,7 @@ class Init
     {
         ?>
         <div class="wrap">
-            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/self-test.php"); ?>
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/self-test.php"); ?>
         </div>
         <?php
     }

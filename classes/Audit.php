@@ -28,7 +28,7 @@ class Audit
             $html = $html_from_file;
             $report = $report_from_file;
         } else {
-            $sleepTimer = get_field('delay_between_crawl_request', 'option') ?? 1;
+            $sleepTimer = carbon_get_theme_option('delay_between_crawl_request') ?? 1;
             if ($sleepTimer>-1){
                 sleep($sleepTimer);
             }

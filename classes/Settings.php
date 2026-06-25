@@ -9,17 +9,38 @@ class Settings
 {
     public static function register(): void
     {
-        Container::make( 'theme_options', __( 'YoLSA Settings' ) )
-            ->set_page_parent( 'chat-gpt-seo-audit' )
-            ->set_page_slug( 'yolsa-settings' )
-            ->add_fields( [
-                Field::make( 'text', 'yolsa_api_key', __( 'ChatGPT API Key' ) ),
-                Field::make( 'text', 'yolsa_api_url', __( 'ChatGPT API URL' ) ),
-                Field::make( 'checkbox', 'yolsa_test_mode', __( 'Test Mode' ) ),
-                Field::make( 'text', 'yolsa_test_api_key', __( 'Test API Key' ) ),
-                Field::make( 'text', 'yolsa_test_api_url', __( 'Test API URL' ) ),
-                Field::make( 'text', 'yolsa_delay', __( 'Delay Between Crawl Requests (seconds)' ) )
-                    ->set_default_value( '1' ),
-            ] );
+        Container::make('theme_options', __('YoLSA Settings', 'yolsa'))
+            ->set_page_parent('yolsa-audit')
+            ->set_page_slug('yolsa-settings')
+            ->add_fields([
+                Field::make('separator', 'crb_api_separator', __('API Configuration', 'yolsa')),
+                Field::make('checkbox', 'yolsa_test_mode', __('Test Mode', 'yolsa')),
+                Field::make('text', 'yolsa_test_token', __('Test API Token', 'yolsa')),
+                Field::make('text', 'yolsa_live_token', __('Live API Token', 'yolsa')),
+                Field::make('text', 'chat_gpt_seo_test_token', __('ChatGPT Test Token', 'yolsa')),
+                Field::make('text', 'chat_gpt_seo_live_token', __('ChatGPT Live Token', 'yolsa')),
+                Field::make('text', 'chat_gpt_seo_api_version', __('ChatGPT API Version', 'yolsa'))
+                    ->set_attribute('placeholder', 'gpt-3.5-turbo'),
+                Field::make('text', 'yolsa_api_version', __('Assistant API Version', 'yolsa'))
+                    ->set_attribute('placeholder', 'gpt-4'),
+                Field::make('separator', 'crb_crawl_separator', __('Crawl Settings', 'yolsa')),
+                Field::make('text', 'delay_between_crawl_request', __('Delay Between Crawl Requests (seconds)', 'yolsa'))
+                    ->set_attribute('type', 'number')
+                    ->set_attribute('placeholder', '1'),
+                Field::make('separator', 'crb_assistant_separator', __('Assistant Instructions', 'yolsa')),
+                Field::make('textarea', 'assistant_instructions', __('System Instructions', 'yolsa')),
+                Field::make('text', 'assistant_keyword_instructions', __('Keyword Instructions', 'yolsa')),
+                Field::make('text', 'assistant_keyword_instructions_force', __('Forced Keyword Instructions', 'yolsa')),
+                Field::make('text', 'assistant_run_instructions', __('Run Instructions', 'yolsa')),
+                Field::make('separator', 'crb_keywords_separator', __('Global Keywords', 'yolsa')),
+                Field::make('complex', 'keyword_list', __('Keyword List', 'yolsa'))
+                    ->add_fields([
+                        Field::make('text', 'keyword', __('Keyword', 'yolsa')),
+                        Field::make('complex', 'kyeword_variations', __('Variations', 'yolsa'))
+                            ->add_fields([
+                                Field::make('text', 'keyword_variation', __('Variation', 'yolsa')),
+                            ]),
+                    ]),
+            ]);
     }
 }

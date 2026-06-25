@@ -1,54 +1,49 @@
 <?php
 /**
- * Plugin Name: YoLSA
- * Plugin URI: https://www.awave.com/
- * Description: SEO analysis for pages and posts. Generate meta description using chat-gpt.
+ * Plugin Name: YoLSA - Your Local SEO Auditor
+ * Plugin URI:
+ * Description: Local SEO auditing tool with keyword tracking and AI-generated meta descriptions.
  * Version: 1.0.16
- * Author: Awave AB
- * Author URI: https://www.awave.com/
- * License: (c) 2020 Awave AB - All right reserved.
+ * Author:
+ * Text Domain: yolsa
+ * Requires at least: 6.0
+ * Requires PHP: 8.0
  */
 
-if ( ! defined( 'YOLSA_VERSION' ) ) {
-    define( 'YOLSA_VERSION', '1.0.16' );
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-if ( ! defined( 'YOLSA_PLUGIN_DIR' ) ) {
-    define( 'YOLSA_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+define('YOLSA_VERSION', '1.0.16');
+define('YOLSA_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('YOLSA_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('YOLSA_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/yolsa');
+define('YOLSA_REPORT_DIR', WP_CONTENT_DIR . '/uploads/yolsa');
+define('YOLSA_REPORT_URL', WP_CONTENT_URL . '/uploads/yolsa');
+
+$autoload = YOLSA_PLUGIN_DIR . 'vendor/autoload.php';
+if (!file_exists($autoload)) {
+    add_action('admin_notices', function () {
+        echo '<div class="notice notice-error"><p><strong>YoLSA:</strong> Run <code>composer install</code> in the plugin directory before activating.</p></div>';
+    });
+    return;
 }
 
-if ( ! defined( 'YOLSA_PLUGIN_URL' ) ) {
-    define( 'YOLSA_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-}
+require_once $autoload;
 
-if ( ! defined( 'YOLSA_PLUGIN_FILE' ) ) {
-    define( 'YOLSA_PLUGIN_FILE', plugin_basename( __FILE__ ) );
-}
+add_action('after_setup_theme', function () {
+    \Carbon_Fields\Carbon_Fields::boot();
+});
 
-if ( file_exists( YOLSA_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
-    require_once YOLSA_PLUGIN_DIR . '/vendor/autoload.php';
-}
-
-use Carbon_Fields\Carbon_Fields;
-
-add_action( 'after_setup_theme', function () {
-    Carbon_Fields::boot();
-} );
-
-add_action( 'carbon_fields_register_fields', [ 'SeoAudit\Settings', 'register' ] );
-
-require_once YOLSA_PLUGIN_DIR . '/classes/Helpers.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/Audit.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/Settings.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/Init.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/RestRoutes.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/ChatGptApi.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/ChatBot.php';
-require_once YOLSA_PLUGIN_DIR . '/classes/Tests.php';
-
-function yolsa_init(): void {
+add_action('plugins_loaded', function () {
     $init = new \SeoAudit\Init();
-    $init->init();
-}
+    add_action('init', [$init, 'init']);
+    add_filter(
+        'plugin_action_links_' . plugin_basename(__FILE__),
+        ['\SeoAudit\Init', 'add_settings_link_to_plugin_list']
+    );
+});
 
-add_action( 'init', 'yolsa_init' );
+register_activation_hook(__FILE__, function () {
+    wp_mkdir_p(YOLSA_UPLOAD_DIR);
+});

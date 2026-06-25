@@ -1,5 +1,4 @@
-# Seo Audit
-- Seo Audit 
+# YoLSA - Your Local SEO Auditor
   - Pages and posts are validated against SEO good practices
     - Page title
     - Meta description
@@ -21,8 +20,8 @@
 - Gives "penalty" score for each content item
 
 # Prerequisites
-- ACF PRO plugin
-- Yoast Seo plugin
+- Carbon Fields (installed via Composer)
+- Yoast SEO plugin
 
 # Todos and ides
 - Get data from search tool, what are keywords that gets visits
@@ -34,35 +33,24 @@
 setting the assistant by the instructions, but only kind of.
 
 # Change log
--- version 1.0.15 ---
-- adding options for acf, to edit instructions for chat GPT
-- adding close button/link added to the popup
-- passing locale to chatgpt
 
--- version 1.0.14 ---
-- adding options for acf, to edit instructions for chat GPT
-- adding close button/link added to the popup
-- passing locale to chatgpt
+## Latest Release: Version 1.0.16 (2026-04-25)
 
+### Highlights
+- ✨ **Complete Rebranding**: Now "YoLSA - Your Local SEO Auditor"
+- 🔄 **Migrated to Carbon Fields**: No longer requires ACF PRO license
+- 📦 **Composer Integration**: Modern dependency management
+- 🎨 **Consistent Naming**: All files, constants, and references updated to "yolsa"
 
---- version 1.0.13 ---
-- refactoring classes
-- moving from conversational api to assistant api
-- some code cleanup
+### ⚠️ Important Breaking Changes
+- Settings must be re-entered (field names changed)
+- Plugin file renamed - WordPress will deactivate/reactivate plugin
+- Requires `composer install` for deployment
+- Upload directory path changed from `/seo-audit/` to `/yolsa/`
 
---- version 1.0.12 ---
-- some refactoring
-- added buttons for clearing all the cashed audit data
-- instead of auto starting audit added button for starting running the audit
-- added keyword audit page / keyword use stats page
-- added authentication to the api requests
-- local keyword flag for in the table
+**[View Full Changelog](CHANGELOG.md)** for detailed information about all versions.
 
---- version 1.0.10 ---
-- bugfixes and code cleanup
-- added table filtering / search
-- added fixed administration menu
-- keywords coming with a fallback if there is not defined for page then use default keywords
+---
 
 --- initial MVP---
 

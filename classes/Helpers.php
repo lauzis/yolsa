@@ -14,16 +14,23 @@ class Helpers
     static public function get_keywords_arr($id = 'option'): array
     {
         $full_list_of_keywords = [];
-        if (have_rows('keyword_list', $id)) {
-            while (have_rows('keyword_list', $id)) {
-                the_row();
-                $keyword = get_sub_field('keyword');
-                $keyword_variations_acf = get_sub_field('keyword_variations');
+        $keyword_list = [];
+        
+        if ($id === 'option') {
+            $keyword_list = carbon_get_theme_option('keyword_list');
+        } else {
+            $keyword_list = carbon_get_post_meta($id, 'keyword_list');
+        }
+        
+        if (!empty($keyword_list)) {
+            foreach ($keyword_list as $item) {
+                $keyword = $item['keyword'] ?? '';
+                $keyword_variations_acf = $item['kyeword_variations'] ?? [];
                 $keyword_variations = [];
                 if ($keyword_variations_acf) {
                     foreach ($keyword_variations_acf as $keyword_variation) {
                         $keyword_variations[] = [
-                            'keyword' => $keyword_variation['keyword_variation'],
+                            'keyword' => $keyword_variation['keyword_variation'] ?? '',
                             'count' => 0,
                             'count_exact' => 0,
                             'count_phrase' => 0,
@@ -259,12 +266,12 @@ class Helpers
 
     static public function save_json($name, $data)
     {
-        file_put_contents(CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json", json_encode($data, JSON_PRETTY_PRINT));
+        file_put_contents(YOLSA_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json", json_encode($data, JSON_PRETTY_PRINT));
     }
 
     static public function get_json($name): array|bool
     {
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json";
+        $file = YOLSA_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json";
         if (file_exists($file)) {
             return json_decode(file_get_contents($file), TRUE);
         }
@@ -273,12 +280,12 @@ class Helpers
 
     static public function save_html_to_file($url, $html): void
     {
-        file_put_contents(CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html", $html);
+        file_put_contents(YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".html", $html);
     }
 
     static public function get_html_from_file($url)
     {
-        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
+        $file = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
         if (file_exists($file)) {
             return file_get_contents($file);
         }
@@ -289,13 +296,13 @@ class Helpers
     {
         $ajax = true;
         ob_start();
-        include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-first-row.php");
+        include(YOLSA_PLUGIN_DIR . "/templates/seo/table-content-item-first-row.php");
         $first_row_html = ob_get_contents();
         ob_end_clean();
 
 
         ob_start();
-        include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-first-row.php");
+        include(YOLSA_PLUGIN_DIR . "/templates/seo/table-content-item-first-row.php");
         $second_row_html = ob_get_contents();
         ob_end_clean();
 
@@ -307,12 +314,12 @@ class Helpers
 
     static public function save_report($url, $report)
     {
-        file_put_contents(CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json", json_encode($report, JSON_PRETTY_PRINT));
+        file_put_contents(YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".json", json_encode($report, JSON_PRETTY_PRINT));
     }
 
     static public function get_report($url)
     {
-        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return json_decode(file_get_contents($file), true);
         }
@@ -321,10 +328,10 @@ class Helpers
 
     static public function remove_report($url)
     {
-        $file_html = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
-        $file_json = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
-        $file_html_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.html";
-        $file_json_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.json";
+        $file_html = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
+        $file_json = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file_html_prev = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.html";
+        $file_json_prev = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.json";
         file_put_contents($file_html_prev, file_get_contents($file_html));
         file_put_contents($file_json_prev, file_get_contents($file_json));
 
@@ -338,8 +345,8 @@ class Helpers
 
     static public function get_report_url($url): bool|string
     {
-        $file_url = CHAT_GPT_SEO_REPORT_URL . "/" . self::generate_file_name($url) . ".json";
-        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file_url = YOLSA_REPORT_URL . "/" . self::generate_file_name($url) . ".json";
+        $file = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return $file_url;
         }
@@ -348,8 +355,8 @@ class Helpers
 
     static public function get_report_html_url($url): bool|string
     {
-        $file_url = CHAT_GPT_SEO_REPORT_URL . "/" . self::generate_file_name($url) . ".html";
-        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
+        $file_url = YOLSA_REPORT_URL . "/" . self::generate_file_name($url) . ".html";
+        $file = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
         if (file_exists($file)) {
             return $file_url;
         }
@@ -358,7 +365,7 @@ class Helpers
 
     static public function get_report_json($url)
     {
-        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file = YOLSA_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return file_get_contents($file);
         }
@@ -380,8 +387,11 @@ class Helpers
 
         $parsed_url = parse_url($url);
 
-        $host = $parsed_url['host'];
+        if (!isset($parsed_url['host'])) {
+            return false;
+        }
 
+        $host = $parsed_url['host'];
 
         if (in_array($host, $domains)) {
             return false;
@@ -627,10 +637,10 @@ class Helpers
     private static function get_all_fields(string $field): array
     {
         $data = [];
-        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
+        $files = scandir(YOLSA_REPORT_DIR);
 
         foreach ($files as $file) {
-            $full_path = CHAT_GPT_SEO_REPORT_DIR . "/" . $file;
+            $full_path = YOLSA_REPORT_DIR . "/" . $file;
             $ext = self::getFileExtension($full_path);
             if ($file !== ".." && $file !== "." && $ext === 'json' && file_exists($full_path)) {
 

@@ -7,12 +7,12 @@ class Keywords
 
     private function get_api_settings():array
     {
-        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
-        $token = get_field('chat_gpt_seo_test_token', 'option');;
-        $url = get_field('chat_gpt_seo_test_url', 'option');;
+        $test_mode = carbon_get_theme_option('yolsa_test_mode');
+        $token = carbon_get_theme_option('chat_gpt_seo_test_token');
+        $url = carbon_get_theme_option('yolsa_test_url');
         if (!$test_mode) {
-            $token = get_field('chat_gpt_seo_live_token', 'option');
-            $url = get_field('chat_gpt_seo_live_url', 'option');;
+            $token = carbon_get_theme_option('chat_gpt_seo_live_token');
+            $url = carbon_get_theme_option('yolsa_live_url');
         }
         return ['token' => $token, 'url' => $url];
     }
@@ -56,7 +56,7 @@ class Keywords
             $html = $html_from_file;
             $report = $report_from_file;
         } else {
-            $sleepTimer = get_field('delay_between_crawl_request', 'option') ?? 1;
+            $sleepTimer = carbon_get_theme_option('delay_between_crawl_request') ?? 1;
             if ($sleepTimer>-1){
                 sleep($sleepTimer);
             }

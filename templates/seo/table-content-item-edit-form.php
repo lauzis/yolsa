@@ -44,7 +44,7 @@ if ($report && !$report['meta_title_keyword_found']) {
 
     <div class="seo-more-info-container">
 
-        <div class="chat-gpt-seo-form">
+        <div class="yolsa-form">
 
             <form id="seo-description-form-<?= $id ?>" class="seo-description-form">
 
