@@ -95,6 +95,27 @@ class RestRoutes
         ];
     }
 
+    public static function run_self_tests(\WP_REST_Request $request): array
+    {
+        $tests = $request->get_param('tests');
+        if (!is_array($tests)) {
+            $tests = !empty($tests) ? [$tests] : array_keys(SelfTest::get_all_tests());
+        }
+
+        $all_tests = SelfTest::get_all_tests();
+        $results = [];
+        foreach ($tests as $id) {
+            $id = sanitize_key($id);
+            if (isset($all_tests[$id])) {
+                $results[$id] = [
+                    'label' => $all_tests[$id]['label'],
+                    'result' => SelfTest::run_test($id),
+                ];
+            }
+        }
+        return $results;
+    }
+
     public static function clear_audit_data() {
         $files = scandir(YOLSA_REPORT_DIR);
         foreach($files as $file){

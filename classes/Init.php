@@ -103,6 +103,14 @@ class Init
                     return current_user_can('edit_others_posts');
                 }
             ));
+
+            register_rest_route('seo-audit/v1', '/self-test', array(
+                'methods' => 'GET',
+                'callback' => 'SeoAudit\RestRoutes::run_self_tests',
+                'permission_callback' => function () {
+                    return current_user_can('manage_options');
+                }
+            ));
         });
     }
 
@@ -121,6 +129,9 @@ class Init
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
             add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
+        }
+        if ($page === 'yolsa-self-test') {
+            add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
         }
     }
 
