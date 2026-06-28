@@ -6,22 +6,22 @@
     - Alt tags
     - Other
   - Checks if there is not duplicate page titles or and meta descriptions
-  - Possible to generate meta description via (chatGPT) (assuming site uses Yoast Seo Plugin)
+  - Possible to generate meta description via ChatGPT (requires Yoast SEO plugin to save the result)
 - Keyword audit
   - Checks for keywords and if they are used exact match or phrase match
   - SEO audit shows if keywords are used in important parts of the site
-  - Lists keywords and shows how often particular keyword is used and in witch sites
-  
+  - Lists keywords and shows how often particular keyword is used and in which pages
+- Self-test page to verify core audit logic is working correctly
 
 # What it does
-- Scans content pages (pages/posts) and validates against soe best practices
+- Scans content pages (pages/posts) and validates against SEO best practices
 - Also checks if the content has keywords in important sections of the content
-- Possible to update meta description / generate it trough chatGpt, based on content of particular page
+- Possible to update meta description / generate it through ChatGPT, based on content of particular page
 - Gives "penalty" score for each content item
 
 # Prerequisites
 - Carbon Fields (installed via Composer)
-- Yoast SEO plugin
+- Yoast SEO plugin (required only for the ChatGPT meta description generation/save feature)
 
 # Todos and ides
 - Get data from search tool, what are keywords that gets visits
@@ -48,7 +48,7 @@ setting the assistant by the instructions, but only kind of.
 - Requires `composer install` for deployment
 - Upload directory path changed from `/seo-audit/` to `/yolsa/`
 
-**[View Full Changelog](CHANGELOG.md)** for detailed information about all versions.
+See the **Change log** section above for detailed information about all versions.
 
 ---
 
