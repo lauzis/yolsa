@@ -10,6 +10,7 @@ class Init
             add_action('admin_menu', [$this, 'add_menu_links']);
             add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
         }
+        \SeoAudit\SeoMeta::registerFallbackMeta();
         $this->setup_hooks();
         $this->setup_api_routes();
     }

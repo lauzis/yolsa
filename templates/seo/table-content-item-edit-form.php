@@ -53,7 +53,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                 <textarea
                         name="meta_description"
                         id="seo-description-<?= $id; ?>"
-                ><?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?></textarea>
+                ><?= \SeoAudit\SeoMeta::getMetaDescription($id) ?></textarea>
 
                 <div class="button-row">
                     <a
@@ -128,8 +128,8 @@ if ($report && !$report['meta_title_keyword_found']) {
             <strong>Title (title tag in header)</strong>: <?= $report['meta_title_text']; ?> <br/>
             <strong>H1</strong>: <?= $report['h1_text']; ?> <br/>
             <strong>First paragraph</strong>: <?= $report['first_paragraph']; ?> <br/>
-            <strong>Meta description</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
-            <strong>Keywords</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
+            <strong>Meta description</strong>: <?= \SeoAudit\SeoMeta::getMetaDescription($id) ?> <br/>
+            <strong>Keywords</strong>: <?= \SeoAudit\SeoMeta::getMetaDescription($id) ?> <br/>
             <strong>Keywords found</strong>:
 
         <ul class="found-keywords">

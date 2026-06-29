@@ -28,7 +28,7 @@ class RestRoutes
         $data = $request->get_json_params();
         $meta_description = $data['meta_description'];
 
-        update_post_meta($id, '_yoast_wpseo_metadesc', $meta_description);
+        \SeoAudit\SeoMeta::setMetaDescription($id, $meta_description);
 
 
         return [

@@ -6,7 +6,7 @@
     - Alt tags
     - Other
   - Checks if there is not duplicate page titles or and meta descriptions
-  - Possible to generate meta description via ChatGPT (requires Yoast SEO plugin to save the result)
+  - Possible to generate meta description via ChatGPT
 - Keyword audit
   - Checks for keywords and if they are used exact match or phrase match
   - SEO audit shows if keywords are used in important parts of the site
@@ -21,7 +21,7 @@
 
 # Prerequisites
 - Carbon Fields (installed via Composer)
-- Yoast SEO plugin (required only for the ChatGPT meta description generation/save feature)
+- Yoast SEO plugin (optional — if active, Yoast meta fields are used automatically; otherwise the plugin stores meta in its own `_yolsa_*` fields)
 
 # Todos and ides
 - Get data from search tool, what are keywords that gets visits
