@@ -1,2 +1,9 @@
 .idea
-vendor/
+
+# NOTE: vendor/ is intentionally committed to git.
+# Many WordPress hostings do not allow running `composer install` on the
+# server (no shell/SSH or no Composer available), so the plugin ships with
+# its dependencies already built to work on any host without a build step.
+# To exclude vendor/ again, uncomment the line below and run `composer install`
+# during deploy instead.
+#vendor/
