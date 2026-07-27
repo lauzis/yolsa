@@ -35,6 +35,10 @@ add_action('after_setup_theme', function () {
     \Carbon_Fields\Carbon_Fields::boot();
 });
 
+// Carbon Fields fires this on `init` at priority 0, so the callback has to be
+// attached before `init` runs — not from inside an `init` callback.
+add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
+
 add_action('plugins_loaded', function () {
     $init = new \SeoAudit\Init();
     add_action('init', [$init, 'init']);

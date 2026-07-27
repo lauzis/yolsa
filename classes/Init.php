@@ -7,8 +7,9 @@ class Init
     public function init(): void
     {
         if (is_admin()) {
-            add_action('admin_menu', [$this, 'add_menu_links']);
-            add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
+            // Priority 9: the parent menu must exist before Carbon Fields attaches
+            // the settings subpage on `admin_menu` at the default priority 10.
+            add_action('admin_menu', [$this, 'add_menu_links'], 9);
         }
         \SeoAudit\SeoMeta::registerFallbackMeta();
         $this->setup_hooks();
@@ -23,7 +24,7 @@ class Init
 
     public static function get_settings_page_url()
     {
-        return esc_url(get_admin_url(null, 'options-general.php?page=' . self::get_settings_page_relative_path()));
+        return esc_url(get_admin_url(null, 'admin.php?page=' . self::get_settings_page_relative_path()));
     }
 
     public static function get_settings_page_relative_path()
