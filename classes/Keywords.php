@@ -129,9 +129,20 @@ class Keywords
 
 
 
-        $ChatBot = new ChatBot();
         // Send the message to our AI.
-        $resMessage = $ChatBot->sendMessage($content, $keywords,  $force_keyword);
+        $resMessage = MetaDescription::generate($content, $keywords, $force_keyword);
+
+        if (is_wp_error($resMessage)) {
+            return [
+                'id'      => $id,
+                'content' => $content,
+                'data'    => $data,
+                'keywords' => $keywords,
+                'response' => $resMessage->get_error_message(),
+                'status'  => 'error',
+            ];
+        }
+
         if ($resMessage){
             return [
                 'id' => $id,

@@ -1,0 +1,17 @@
+{
+  "sections": [
+    {
+      "id": "logging",
+      "title": "Logging",
+      "description": "Records plugin actions to daily log files in the uploads directory. Useful when diagnosing a problem; leave it off otherwise.",
+      "fields": [
+        {
+          "id": "logs_enabled",
+          "type": "checkbox",
+          "title": "Enable logging",
+          "help_text": "Write plugin actions to a daily log file. Errors are always recorded in PHP's error log regardless of this setting."
+        }
+      ]
+    }
+  ]
+}

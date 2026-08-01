@@ -1,0 +1,75 @@
+{
+  "tabs": [
+    {
+      "id": "keywords",
+      "title": "Keywords",
+      "fields": [
+        {
+          "id": "keyword_list",
+          "type": "complex",
+          "title": "Keyword List",
+          "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
+          "fields": [
+            { "id": "keyword", "type": "text", "title": "Keyword" },
+            {
+              "id": "keyword_variations",
+              "type": "complex",
+              "title": "Variations",
+              "fields": [
+                { "id": "keyword_variation", "type": "text", "title": "Variation" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "instructions",
+      "title": "AI Instructions",
+      "description": "What the model is told to do. The provider itself is configured on the AI Provider tab.",
+      "fields": [
+        {
+          "id": "assistant_instructions",
+          "type": "textarea",
+          "title": "System Instructions",
+          "default_value": "You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters. The summary should always be written in the same language as the article itself.",
+          "help_text": "The system prompt sent with every request."
+        },
+        {
+          "id": "assistant_keyword_instructions",
+          "type": "text",
+          "title": "Keyword Instructions",
+          "default_value": "Take into consideration using these keywords in the meta description:",
+          "help_text": "Prefix used when keywords should be considered but are not mandatory."
+        },
+        {
+          "id": "assistant_keyword_instructions_force",
+          "type": "text",
+          "title": "Forced Keyword Instructions",
+          "default_value": "The description MUST include at least one of these words or phrases:",
+          "help_text": "Prefix used when at least one keyword must appear in the result."
+        },
+        {
+          "id": "assistant_run_instructions",
+          "type": "text",
+          "title": "Run Instructions",
+          "default_value": "Generate the meta description in the same language as the provided text. It must be under 200 characters.",
+          "help_text": "Appended to every request, after the content."
+        }
+      ]
+    },
+    {
+      "id": "crawl",
+      "title": "Crawl",
+      "fields": [
+        {
+          "id": "delay_between_crawl_request",
+          "type": "text",
+          "title": "Delay Between Crawl Requests (seconds)",
+          "default_value": "1",
+          "attributes": { "type": "number", "min": "0" }
+        }
+      ]
+    }
+  ]
+}

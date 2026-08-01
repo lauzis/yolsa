@@ -6,6 +6,10 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitf2748b29e0e4048b52509051c5586e61
 {
+    public static $files = array (
+        '2607275bf2453ac5427a498df4804ddb' => __DIR__ . '/..' . '/lauzis/wp-plugin-packages/bootstrap.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'S' =>
         array (
@@ -160,16 +164,14 @@ class ComposerStaticInitf2748b29e0e4048b52509051c5586e61
         'Carbon_Fields\\Widget\\Widget' => __DIR__ . '/..' . '/htmlburger/carbon-fields/core/Widget/Widget.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'SeoAudit\\Audit' => __DIR__ . '/../..' . '/classes/Audit.php',
-        'SeoAudit\\ChatBot' => __DIR__ . '/../..' . '/classes/ChatBot.php',
-        'SeoAudit\\ChatGptApi' => __DIR__ . '/../..' . '/classes/ChatGptApi.php',
         'SeoAudit\\Helpers' => __DIR__ . '/../..' . '/classes/Helpers.php',
         'SeoAudit\\Init' => __DIR__ . '/../..' . '/classes/Init.php',
         'SeoAudit\\Keywords' => __DIR__ . '/../..' . '/classes/Keywords.php',
+        'SeoAudit\\MetaDescription' => __DIR__ . '/../..' . '/classes/MetaDescription.php',
         'SeoAudit\\RestRoutes' => __DIR__ . '/../..' . '/classes/RestRoutes.php',
         'SeoAudit\\SelfTest' => __DIR__ . '/../..' . '/classes/SelfTest.php',
         'SeoAudit\\SeoMeta' => __DIR__ . '/../..' . '/classes/SeoMeta.php',
         'SeoAudit\\Settings' => __DIR__ . '/../..' . '/classes/Settings.php',
-        'SeoAudit\\Tests' => __DIR__ . '/../..' . '/classes/Tests.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

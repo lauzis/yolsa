@@ -142,8 +142,49 @@
                 "source": "https://github.com/htmlburger/carbon-fields"
             },
             "install-path": "../htmlburger/carbon-fields"
+        },
+        {
+            "name": "lauzis/wp-plugin-packages",
+            "version": "v1.6.2",
+            "version_normalized": "1.6.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lauzis/wp-plugin-packages.git",
+                "reference": "2e1dec02cb13073067ef4c0b23af4deffe5a9c9b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lauzis/wp-plugin-packages/zipball/2e1dec02cb13073067ef4c0b23af4deffe5a9c9b",
+                "reference": "2e1dec02cb13073067ef4c0b23af4deffe5a9c9b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "time": "2026-08-01T15:45:04+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "scripts": {
+                "test": [
+                    "php tests/run.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Shared components for the lauzis WordPress plugins: file logging, admin notices and toasts, behind a single version gate.",
+            "support": {
+                "source": "https://github.com/lauzis/wp-plugin-packages/tree/v1.6.2",
+                "issues": "https://github.com/lauzis/wp-plugin-packages/issues"
+            },
+            "install-path": "../lauzis/wp-plugin-packages"
         }
     ],
-    "dev": true,
+    "dev": false,
     "dev-package-names": []
 }

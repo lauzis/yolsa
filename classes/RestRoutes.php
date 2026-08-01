@@ -63,35 +63,38 @@ class RestRoutes
 
         $content = \SeoAudit\Helpers::clean_html($content);
 
-        $ChatBot = new \SeoAudit\ChatGptApi();
         // Send the message to our AI.
-        $resMessage = $ChatBot->generate_meta_description($content, $keywords,  $force_keyword, $lang);
+        $resMessage = \SeoAudit\MetaDescription::generate($content, $keywords, $force_keyword, (string) $lang);
+
+        if (is_wp_error($resMessage)) {
+            return [
+                'id'       => $id,
+                'content'  => $content,
+                'data'     => $data,
+                'keywords' => $keywords,
+                'response' => $resMessage->get_error_message(),
+                'status'   => 'error',
+            ];
+        }
+
         if ($resMessage){
             return [
-                'aaaaaa'=>'beeeeeeee',
                 'id' => $id,
                 'content'=>$content,
                 'data'=>$data,
                 'keywords' => $keywords,
-                'response'=>$resMessage['message'],
-                'status'=>'ok',
-                'debug'=>$resMessage['debug'],
-                'resMessage'=>$resMessage,
-                'chatBot'=>json_encode($ChatBot)
+                'response'=>$resMessage,
+                'status'=>'ok'
             ];
         }
-        //$jsonResponse = json_encode(array("responseMessage" => $resMessage));
+        // The model returned nothing usable but did not report an error.
         return [
-            'ccccccccccccccc'=>'dddddddddddddddddddddddd',
-            'id' => $id,
-            'content'=>$content,
-            'data'=>$data,
+            'id'       => $id,
+            'content'  => $content,
+            'data'     => $data,
             'keywords' => $keywords,
-            'response'=>"Pleace check if you have valid ChatGpt token",
-            'status'=>'failed',
-            'debug'=>$resMessage['debug'],
-            'resMessage'=>$resMessage,
-            'chatBot'=>json_encode($ChatBot)
+            'response' => __('The AI provider returned an empty response. Check the provider settings.', 'yolsa'),
+            'status'   => 'failed',
         ];
     }
 

@@ -2,49 +2,71 @@
 
 namespace SeoAudit;
 
-use Carbon_Fields\Container;
-use Carbon_Fields\Field;
-
+/**
+ * YoLSA's settings page.
+ *
+ * Fields are declared in config/settings.json and rendered by the shared
+ * lauzis/wp-plugin-packages settings component. The AI provider configuration
+ * comes from the package's own schema, so it matches the other plugins.
+ */
 class Settings
 {
+    /**
+     * Returns the shared settings page, or null when the package is absent.
+     *
+     * @return \Lauzis\WpPackages\Settings\Settings|null
+     */
+    public static function page()
+    {
+        if (!class_exists('WpPackages_Registry')) {
+            return null;
+        }
+
+        return \WpPackages_Registry::settings('yolsa', [
+            'title'       => __('YoLSA Settings', 'yolsa'),
+            'mode'        => 'tabs',
+            'page_parent' => 'yolsa-audit',
+            'page_file'   => 'yolsa-settings',
+        ]);
+    }
+
+    /** Declares the settings fields. Hooked on carbon_fields_register_fields. */
     public static function register(): void
     {
-        Container::make('theme_options', __('YoLSA Settings', 'yolsa'))
-            ->set_page_parent('yolsa-audit')
-            ->set_page_file('yolsa-settings')
-            // Tab order follows the order of these calls — keywords first.
-            ->add_tab(__('Keywords', 'yolsa'), [
-                Field::make('complex', 'keyword_list', __('Keyword List', 'yolsa'))
-                    ->set_help_text(__('Keywords audited across the site. Each keyword can have variations that count towards the same keyword.', 'yolsa'))
-                    ->add_fields([
-                        Field::make('text', 'keyword', __('Keyword', 'yolsa')),
-                        Field::make('complex', 'kyeword_variations', __('Variations', 'yolsa'))
-                            ->add_fields([
-                                Field::make('text', 'keyword_variation', __('Variation', 'yolsa')),
-                            ]),
-                    ]),
-            ])
-            ->add_tab(__('API', 'yolsa'), [
-                Field::make('checkbox', 'yolsa_test_mode', __('Test Mode', 'yolsa')),
-                Field::make('text', 'yolsa_test_token', __('Test API Token', 'yolsa')),
-                Field::make('text', 'yolsa_live_token', __('Live API Token', 'yolsa')),
-                Field::make('text', 'chat_gpt_seo_test_token', __('ChatGPT Test Token', 'yolsa')),
-                Field::make('text', 'chat_gpt_seo_live_token', __('ChatGPT Live Token', 'yolsa')),
-                Field::make('text', 'chat_gpt_seo_api_version', __('ChatGPT API Version', 'yolsa'))
-                    ->set_attribute('placeholder', 'gpt-3.5-turbo'),
-                Field::make('text', 'yolsa_api_version', __('Assistant API Version', 'yolsa'))
-                    ->set_attribute('placeholder', 'gpt-4'),
-            ])
-            ->add_tab(__('AI Instructions', 'yolsa'), [
-                Field::make('textarea', 'assistant_instructions', __('System Instructions', 'yolsa')),
-                Field::make('text', 'assistant_keyword_instructions', __('Keyword Instructions', 'yolsa')),
-                Field::make('text', 'assistant_keyword_instructions_force', __('Forced Keyword Instructions', 'yolsa')),
-                Field::make('text', 'assistant_run_instructions', __('Run Instructions', 'yolsa')),
-            ])
-            ->add_tab(__('Crawl', 'yolsa'), [
-                Field::make('text', 'delay_between_crawl_request', __('Delay Between Crawl Requests (seconds)', 'yolsa'))
-                    ->set_attribute('type', 'number')
-                    ->set_attribute('placeholder', '1'),
-            ]);
+        $page = self::page();
+
+        if (!$page) {
+            return;
+        }
+
+        // No prefix: YoLSA's option keys predate the shared loader and are kept
+        // exactly as they are, so nothing stored has to move.
+        $page->register(YOLSA_PLUGIN_DIR . 'config/settings.json', [
+            'prefix' => '',
+            'domain' => 'yolsa',
+        ]);
+
+        // The provider fields are prefixed, since they are new here and a bare
+        // "llm_provider" option would be far too generic to sit unnamespaced.
+        $page->register(\WpPackages_Registry::schema('llm'), [
+            'prefix' => 'yolsa_',
+            'domain' => 'wp-plugin-packages',
+        ]);
+
+        $page->render();
+    }
+
+    /**
+     * Reads a setting by its id.
+     *
+     * @param string $id
+     * @param mixed  $default
+     * @return mixed
+     */
+    public static function get(string $id, $default = null)
+    {
+        $page = self::page();
+
+        return $page ? $page->get($id, $default) : $default;
     }
 }
