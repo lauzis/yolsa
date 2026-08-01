@@ -6,11 +6,6 @@
     "require": {
         "php": ">=7.4"
     },
-    "autoload": {
-        "files": [
-            "bootstrap.php"
-        ]
-    },
     "config": {
         "optimize-autoloader": true
     },

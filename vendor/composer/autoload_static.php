@@ -6,10 +6,6 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitf2748b29e0e4048b52509051c5586e61
 {
-    public static $files = array (
-        '2607275bf2453ac5427a498df4804ddb' => __DIR__ . '/..' . '/lauzis/wp-plugin-packages/bootstrap.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
         'S' =>
         array (

@@ -145,30 +145,25 @@
         },
         {
             "name": "lauzis/wp-plugin-packages",
-            "version": "v1.6.2",
-            "version_normalized": "1.6.2.0",
+            "version": "v1.7.0",
+            "version_normalized": "1.7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lauzis/wp-plugin-packages.git",
-                "reference": "2e1dec02cb13073067ef4c0b23af4deffe5a9c9b"
+                "reference": "7dadd6510b4dff2231a0f30122cd05a0884e053e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lauzis/wp-plugin-packages/zipball/2e1dec02cb13073067ef4c0b23af4deffe5a9c9b",
-                "reference": "2e1dec02cb13073067ef4c0b23af4deffe5a9c9b",
+                "url": "https://api.github.com/repos/lauzis/wp-plugin-packages/zipball/7dadd6510b4dff2231a0f30122cd05a0884e053e",
+                "reference": "7dadd6510b4dff2231a0f30122cd05a0884e053e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
-            "time": "2026-08-01T15:45:04+00:00",
+            "time": "2026-08-01T21:49:42+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
             "scripts": {
                 "test": [
                     "php tests/run.php"
@@ -179,7 +174,7 @@
             ],
             "description": "Shared components for the lauzis WordPress plugins: file logging, admin notices and toasts, behind a single version gate.",
             "support": {
-                "source": "https://github.com/lauzis/wp-plugin-packages/tree/v1.6.2",
+                "source": "https://github.com/lauzis/wp-plugin-packages/tree/v1.7.0",
                 "issues": "https://github.com/lauzis/wp-plugin-packages/issues"
             },
             "install-path": "../lauzis/wp-plugin-packages"

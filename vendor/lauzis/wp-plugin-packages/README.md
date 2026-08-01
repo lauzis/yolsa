@@ -30,7 +30,22 @@ Not on Packagist. Consume it from GitHub:
 ```
 
 The consuming plugin must load `vendor/autoload.php` early — before anything
-that might log or register a notice.
+that might log or register a notice — **and require this package's bootstrap
+explicitly**:
+
+```php
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/vendor/lauzis/wp-plugin-packages/bootstrap.php';
+```
+
+The second line is not optional and the package deliberately does not use
+Composer's `files` autoload for it. Composer keys that mechanism on an
+identifier derived from the package name, which is byte-identical in every
+plugin's `vendor/` directory, so it runs exactly **one** copy's bootstrap per
+request and every other copy silently never registers. The version gate then
+cannot see them, and whichever plugin loaded first wins regardless of version.
+`require_once` keys on the resolved path, which differs per plugin, so every
+copy is seen.
 
 Each plugin keeps its own thin facade class over these components, so its own
 call sites and settings semantics stay where they belong. Every facade should

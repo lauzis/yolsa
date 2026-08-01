@@ -75,6 +75,7 @@ function wp_send_json_error( $message = '', $code = null ) { throw new WpJsonHal
 function wp_send_json_success( $data = null ) { throw new WpJsonHalt( 'success' ); }
 
 require __DIR__ . '/fake-carbon-fields.php';
+// Required explicitly, exactly as a consuming plugin must — see Registry.
 require dirname( __DIR__ ) . '/bootstrap.php';
 
 $pass = 0;
@@ -615,6 +616,36 @@ $GLOBALS['options']['_llmplug_llm_access_key'] = 'from-settings';
 $GLOBALS['http_responses'] = array( array( 'code' => 200, 'body' => '{"content":[{"text":"via settings"}]}' ) );
 check( 'the client reads its settings from the schema', WpPackages_Registry::llm( 'llmplug' )->complete( 'p', 'c' ), 'via settings' );
 check( 'using the stored key', end( $GLOBALS['http'] )['args']['headers']['x-api-key'], 'from-settings' );
+
+
+echo "version gate — multi-plugin arbitration\n";
+// Reproduces the live failure: three plugins, one bundling an older copy. The
+// older copy must not win just because its plugin loaded first.
+$gate = new ReflectionClass( 'WpPackages_Registry' );
+$copies = $gate->getProperty( 'copies' ); $copies->setAccessible( true );
+$roots  = $gate->getProperty( 'roots' );  $roots->setAccessible( true );
+$booted = $gate->getProperty( 'booted' ); $booted->setAccessible( true );
+
+$saved_copies = $copies->getValue(); $saved_roots = $roots->getValue(); $saved_booted = $booted->getValue();
+
+$copies->setValue( null, array() );
+$roots->setValue( null, array() );
+$booted->setValue( null, false );
+
+// Registration order deliberately puts the oldest first, as alphabetical plugin
+// load order did on the live site (rest-in-sync before splecheh and yolsa).
+WpPackages_Registry::register( '1.5.2', '/rest-in-sync/load.php', '/rest-in-sync' );
+WpPackages_Registry::register( '1.6.2', '/splecheh/load.php', '/splecheh' );
+WpPackages_Registry::register( '1.6.2', '/yolsa/load.php', '/yolsa' );
+
+check( 'the newest copy wins, not the first registered', WpPackages_Registry::active_version(), '1.6.2' );
+check( 'and schemas resolve against it', WpPackages_Registry::active_root() !== '/rest-in-sync', true );
+
+$copies->setValue( null, $saved_copies );
+$roots->setValue( null, $saved_roots );
+$booted->setValue( null, $saved_booted );
+
+check( 'boot is deferred to plugins_loaded', isset( $GLOBALS['hooks']['plugins_loaded'] ), true );
 
 
 // ============================================================ version gate ==

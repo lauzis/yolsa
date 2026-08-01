@@ -30,6 +30,9 @@ if (!file_exists($autoload)) {
 }
 
 require_once $autoload;
+// Required explicitly: Composer's files autoload runs only one copy of this
+// package per request, so the version gate would never see the others.
+require_once YOLSA_PLUGIN_DIR . 'vendor/lauzis/wp-plugin-packages/bootstrap.php';
 
 add_action('after_setup_theme', function () {
     \Carbon_Fields\Carbon_Fields::boot();

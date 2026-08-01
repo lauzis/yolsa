@@ -16,6 +16,13 @@
  * One registry covers every component. That is the reason the components live
  * in a single package: a registry per component would mean several copies of
  * this same never-changeable arbitration logic.
+ *
+ * IMPORTANT: each plugin must require the package's bootstrap.php explicitly,
+ * rather than leaving it to Composer's "files" autoload. Composer keys that
+ * mechanism on an identifier derived from the package name, which is identical
+ * in every plugin's vendor directory, so it runs exactly one copy's bootstrap
+ * for the whole request and the rest never register at all. require_once keys
+ * on the resolved path, which differs per plugin, so every copy is seen.
  */
 
 if ( class_exists( 'WpPackages_Registry', false ) ) {
@@ -33,6 +40,9 @@ class WpPackages_Registry {
 	/** @var bool */
 	private static $booted = false;
 
+	/** @var bool Whether the deferred boot has been scheduled. */
+	private static $hooked = false;
+
 	/** @var array<string, array<string, mixed>> component => slug => instance */
 	private static $instances = array();
 
@@ -47,6 +57,20 @@ class WpPackages_Registry {
 	public static function register( $version, $path, $root ) {
 		self::$copies[ $version ] = $path;
 		self::$roots[ $version ]  = $root;
+
+		// Arbitration is only correct once every active plugin has registered,
+		// which is not until all plugin files have run. Booting on first use
+		// instead would lock in whichever copy happened to be asked first --
+		// exactly the outcome this class exists to prevent.
+		if ( self::$hooked || self::$booted ) {
+			return;
+		}
+
+		if ( function_exists( 'add_action' ) && function_exists( 'did_action' ) && ! did_action( 'plugins_loaded' ) ) {
+			self::$hooked = true;
+
+			add_action( 'plugins_loaded', array( __CLASS__, 'boot' ), -9999 );
+		}
 	}
 
 	/** Loads the highest registered version. Idempotent. */
