@@ -46,9 +46,15 @@ class Settings
             'domain' => 'yolsa',
         ]);
 
-        // The provider fields are prefixed, since they are new here and a bare
-        // "llm_provider" option would be far too generic to sit unnamespaced.
+        // The provider and logging fields are prefixed, since they are new here
+        // and bare names like "llm_provider" would be far too generic to sit
+        // unnamespaced alongside other plugins' options.
         $page->register(\WpPackages_Registry::schema('llm'), [
+            'prefix' => 'yolsa_',
+            'domain' => 'wp-plugin-packages',
+        ]);
+
+        $page->register(\WpPackages_Registry::schema('logs'), [
             'prefix' => 'yolsa_',
             'domain' => 'wp-plugin-packages',
         ]);

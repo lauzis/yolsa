@@ -40,16 +40,38 @@ class MetaDescription
             return new \WP_Error('yolsa_no_llm', __('The shared LLM component is unavailable.', 'yolsa'));
         }
 
-        $text = \WpPackages_Registry::llm('yolsa')->complete(
+        $client = \WpPackages_Registry::llm('yolsa');
+
+        Logs::add('meta-description', 'Requesting a meta description.', [
+            'provider' => $client->provider(),
+            'model'    => $client->model_label(),
+            'chars'    => strlen($content),
+            'keywords' => $keywords,
+            'forced'   => $forceKeywords,
+        ]);
+
+        $text = $client->complete(
             self::prompt($keywords, $forceKeywords, $language),
             $content
         );
 
         if (is_wp_error($text)) {
+            Logs::error('meta-description', 'The provider returned an error.', [
+                'code'  => $text->get_error_code(),
+                'error' => $text->get_error_message(),
+            ]);
+
             return $text;
         }
 
-        return self::tidy($text);
+        $description = self::tidy($text);
+
+        Logs::add('meta-description', 'Generated a meta description.', [
+            'chars'    => strlen($description),
+            'over_max' => strlen($description) > self::MAX_LENGTH,
+        ]);
+
+        return $description;
     }
 
     /**

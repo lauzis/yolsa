@@ -184,6 +184,15 @@ class Init
             [$this, 'self_test']
         );
 
+        add_submenu_page(
+            'yolsa-audit',
+            'Logs',
+            'Logs',
+            'manage_options',
+            'yolsa-logs',
+            [$this, 'logs']
+        );
+
     }
 
     public function keyword_audit(): void
@@ -201,6 +210,33 @@ class Init
         ?>
         <div class="wrap">
             <?php include(YOLSA_PLUGIN_DIR . "/templates/seo.php"); ?>
+        </div>
+        <?php
+    }
+
+    /** Admin page callback: renders the log viewer. */
+    public function logs(): void
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        if (
+            isset($_POST['action'], $_POST['yolsa_clear_logs_nonce'])
+            && 'clear_logs' === $_POST['action']
+            && wp_verify_nonce(sanitize_key(wp_unslash($_POST['yolsa_clear_logs_nonce'])), 'yolsa_clear_logs')
+        ) {
+            \SeoAudit\Logs::clear();
+        }
+
+        $files    = \SeoAudit\Logs::files();
+        $dates    = array_column($files, 'date');
+        $requested = isset($_GET['log_date']) ? sanitize_key(wp_unslash($_GET['log_date'])) : '';
+        $selected = in_array($requested, $dates, true) ? $requested : ($dates[0] ?? '');
+        $lines    = '' === $selected ? [] : \SeoAudit\Logs::read($selected);
+        ?>
+        <div class="wrap">
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/logs.php"); ?>
         </div>
         <?php
     }

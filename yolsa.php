@@ -21,6 +21,14 @@ define('YOLSA_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/yolsa');
 define('YOLSA_REPORT_DIR', WP_CONTENT_DIR . '/uploads/yolsa');
 define('YOLSA_REPORT_URL', WP_CONTENT_URL . '/uploads/yolsa');
 
+if (!defined('YOLSA_LOG_PATH')) {
+    // Under uploads/, never inside the plugin directory: WordPress deletes and
+    // re-extracts that folder on every update, which would take the logs with it.
+    $yolsa_uploads = wp_upload_dir();
+    define('YOLSA_LOG_PATH', str_replace('\\', '/', $yolsa_uploads['basedir']) . '/yolsa-logs/');
+    unset($yolsa_uploads);
+}
+
 $autoload = YOLSA_PLUGIN_DIR . 'vendor/autoload.php';
 if (!file_exists($autoload)) {
     add_action('admin_notices', function () {
