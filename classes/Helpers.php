@@ -252,7 +252,12 @@ class Helpers
         $err = curl_errno($ch);
         $errmsg = curl_error($ch);
         $header = curl_getinfo($ch);
-        curl_close($ch);
+
+        // curl_close() has done nothing since PHP 8.0 and is deprecated in 8.5;
+        // the handle is released when it goes out of scope.
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch);
+        }
 
         $status = $header['http_code'];
         return ['content' => $content, 'status' => $status];
@@ -637,7 +642,13 @@ class Helpers
     private static function get_all_fields(string $field): array
     {
         $data = [];
-        $files = scandir(YOLSA_REPORT_DIR);
+
+        // The report directory is only created once something has been audited.
+        if (!is_dir(YOLSA_REPORT_DIR)) {
+            return $data;
+        }
+
+        $files = scandir(YOLSA_REPORT_DIR) ?: [];
 
         foreach ($files as $file) {
             $full_path = YOLSA_REPORT_DIR . "/" . $file;
