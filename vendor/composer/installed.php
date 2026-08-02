@@ -3,7 +3,7 @@
         'name' => 'lauzis/yolsa',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'ff04195529e06ba13e38770f57738e4b27b334a4',
+        'reference' => '85c030529d6a0b70542df8509e32550308fffd22',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'lauzis/yolsa' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'ff04195529e06ba13e38770f57738e4b27b334a4',
+            'reference' => '85c030529d6a0b70542df8509e32550308fffd22',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

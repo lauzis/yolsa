@@ -140,6 +140,7 @@ return array(
     'SeoAudit\\Helpers' => $baseDir . '/classes/Helpers.php',
     'SeoAudit\\Init' => $baseDir . '/classes/Init.php',
     'SeoAudit\\Keywords' => $baseDir . '/classes/Keywords.php',
+    'SeoAudit\\Logs' => $baseDir . '/classes/Logs.php',
     'SeoAudit\\MetaDescription' => $baseDir . '/classes/MetaDescription.php',
     'SeoAudit\\RestRoutes' => $baseDir . '/classes/RestRoutes.php',
     'SeoAudit\\SelfTest' => $baseDir . '/classes/SelfTest.php',

@@ -163,6 +163,7 @@ class ComposerStaticInitf2748b29e0e4048b52509051c5586e61
         'SeoAudit\\Helpers' => __DIR__ . '/../..' . '/classes/Helpers.php',
         'SeoAudit\\Init' => __DIR__ . '/../..' . '/classes/Init.php',
         'SeoAudit\\Keywords' => __DIR__ . '/../..' . '/classes/Keywords.php',
+        'SeoAudit\\Logs' => __DIR__ . '/../..' . '/classes/Logs.php',
         'SeoAudit\\MetaDescription' => __DIR__ . '/../..' . '/classes/MetaDescription.php',
         'SeoAudit\\RestRoutes' => __DIR__ . '/../..' . '/classes/RestRoutes.php',
         'SeoAudit\\SelfTest' => __DIR__ . '/../..' . '/classes/SelfTest.php',
