@@ -184,14 +184,19 @@ class Init
             [$this, 'self_test']
         );
 
-        add_submenu_page(
-            'yolsa-audit',
-            'Logs',
-            'Logs',
-            'manage_options',
-            'yolsa-logs',
-            [$this, 'logs']
-        );
+        // Hidden while logging is switched off — there is nothing to show, and
+        // the same is true of splecheh's Logs page. The page callback keeps its
+        // own capability check, so this is presentation only.
+        if (\SeoAudit\Logs::enabled()) {
+            add_submenu_page(
+                'yolsa-audit',
+                'Logs',
+                'Logs',
+                'manage_options',
+                'yolsa-logs',
+                [$this, 'logs']
+            );
+        }
 
     }
 
