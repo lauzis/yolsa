@@ -23,7 +23,9 @@ class Settings
         }
 
         return \WpPackages_Registry::settings('yolsa', [
-            'title'       => __('YoLSA Settings', 'yolsa'),
+            // Just "Settings": the menu it sits under is already called YoLSA,
+            // and the other plugins label theirs the same way.
+            'title'       => __('Settings', 'yolsa'),
             'mode'        => 'tabs',
             'page_parent' => 'yolsa-audit',
             'page_file'   => 'yolsa-settings',
