@@ -25,9 +25,12 @@
  * on the resolved path, which differs per plugin, so every copy is seen.
  */
 
-if ( class_exists( 'WpPackages_Registry', false ) ) {
-	return;
-}
+// The declaration must sit INSIDE the conditional, not after an early return.
+// PHP early-binds a top-level class that has no parent, declaring it while the
+// file is compiled — before any guard above it has run. Every plugin includes
+// its own copy of this file, so an early return would still fatal with
+// "Cannot redeclare class".
+if ( ! class_exists( 'WpPackages_Registry', false ) ) :
 
 class WpPackages_Registry {
 
@@ -209,3 +212,5 @@ class WpPackages_Registry {
 		return null === $version ? null : self::$roots[ $version ];
 	}
 }
+
+endif;

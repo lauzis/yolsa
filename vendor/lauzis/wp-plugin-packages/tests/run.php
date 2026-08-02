@@ -619,6 +619,16 @@ check( 'using the stored key', end( $GLOBALS['http'] )['args']['headers']['x-api
 
 
 echo "version gate — multi-plugin arbitration\n";
+// Every plugin includes its own copy of Registry.php. PHP early-binds a
+// top-level class with no parent, so a guard that merely returns early still
+// fatals with "Cannot redeclare class" — this is that regression.
+$second = shell_exec( 'php -r ' . escapeshellarg(
+    'require ' . var_export( dirname( __DIR__ ) . '/src/Registry.php', true ) . ';'
+    . 'require ' . var_export( dirname( __DIR__ ) . '/src/Registry.php', true ) . ';'
+    . 'echo "ok";'
+) . ' 2>&1' );
+check( 'Registry.php can be included by several plugins', trim( (string) $second ), 'ok' );
+
 // Reproduces the live failure: three plugins, one bundling an older copy. The
 // older copy must not win just because its plugin loaded first.
 $gate = new ReflectionClass( 'WpPackages_Registry' );
