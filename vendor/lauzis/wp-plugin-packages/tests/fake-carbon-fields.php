@@ -95,6 +95,9 @@ namespace Carbon_Fields {
 		/** @var Field[] */
 		public $children = array();
 
+		/** @var array|null Field-type-specific config, e.g. wp_editor settings. */
+		public $settings = null;
+
 		public static function make( $type, $id, $label = null ) {
 			$f        = new self();
 			$f->type  = $type;
@@ -110,6 +113,11 @@ namespace Carbon_Fields {
 		public function set_default_value( $v )     { $this->default_value = $v;     return $this; }
 		public function set_conditional_logic( $c ) { $this->conditional_logic = $c; return $this; }
 		public function set_required( $r )          { $this->required = $r;          return $this; }
+
+		public function set_settings( $s ) {
+			$this->settings = $s;
+			return $this;
+		}
 
 		public function set_attribute( $n, $v ) {
 			$this->attributes[ $n ] = $v;

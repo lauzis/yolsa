@@ -148,6 +148,17 @@ class WpPackages_Registry {
 	}
 
 	/**
+	 * Returns the migration runner for a plugin, creating it on first use.
+	 *
+	 * @param string $slug   Plugin slug.
+	 * @param array  $config See Lauzis\WpPackages\Migrations\Runner::__construct().
+	 * @return \Lauzis\WpPackages\Migrations\Runner
+	 */
+	public static function migrations( $slug, array $config = array() ) {
+		return self::instance( 'migrations', $slug, $config, '\Lauzis\WpPackages\Migrations\Runner' );
+	}
+
+	/**
 	 * Absolute path to a schema file shipped by this package.
 	 *
 	 * Resolved against the winning copy, so the schema always matches the code

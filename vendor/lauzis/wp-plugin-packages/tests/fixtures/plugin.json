@@ -16,7 +16,14 @@
           "id": "language",
           "type": "text",
           "title": "Language",
-          "default_value": "@callback:default_language"
+          "default_value": "@callback:default_language",
+          "settings": "not-an-array"
+        },
+        {
+          "id": "intro",
+          "type": "rich_text",
+          "title": "Intro",
+          "settings": { "media_buttons": false }
         },
         {
           "id": "batch_size",

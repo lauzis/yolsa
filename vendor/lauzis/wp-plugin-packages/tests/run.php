@@ -52,6 +52,11 @@ function wp_enqueue_style( $h, $src = '', $d = array(), $v = null ) { $GLOBALS['
 function wp_enqueue_script( $h, $src = '', $d = array(), $v = null, $f = false ) { $GLOBALS['enqueued'][ $h ] = $src; }
 function wp_localize_script( $h, $name, $data ) { $GLOBALS['localized'][ $name ] = $data; }
 function check_ajax_referer( $action, $field = false ) { return true; }
+$GLOBALS['transients'] = array();
+function get_transient( $k ) { return $GLOBALS['transients'][ $k ] ?? false; }
+function set_transient( $k, $v, $ttl = 0 ) { $GLOBALS['transients'][ $k ] = $v; return true; }
+function delete_transient( $k ) { unset( $GLOBALS['transients'][ $k ] ); return true; }
+function wp_remote_retrieve_header( $r, $h ) { return $r['headers'][ $h ] ?? ''; }
 
 class WP_Error {
 	public $code; public $message;
@@ -405,6 +410,13 @@ check( 'help text applied', $c->find( 'demo_post_types' )->help_text, 'Which pos
 check( 'callback default resolved', $c->find( 'demo_language' )->default_value, 'lv' );
 check( 'literal default kept', $c->find( 'demo_batch_size' )->default_value, '50' );
 check( 'attributes applied', $c->find( 'demo_batch_size' )->attributes, array( 'type' => 'number', 'min' => '1' ) );
+
+// Field-type-specific config, e.g. the wp_editor settings a rich_text field
+// takes. Passed straight through so the schema does not need to know about
+// every field type Carbon Fields offers.
+check( 'settings passed through', $c->find( 'demo_intro' )->settings, array( 'media_buttons' => false ) );
+check( 'no settings leaves it unset', $c->find( 'demo_batch_size' )->settings, null );
+check( 'a non-array settings value is ignored', $c->find( 'demo_language' )->settings, null );
 check( 'static options kept', $c->find( 'demo_mode' )->options, array( 'commandline' => 'Commandline', 'api' => 'Hosted API' ) );
 check( 'conditional logic applied', $c->find( 'demo_command' )->conditional_logic[0]['field'], 'demo_mode' );
 check( 'html field carries markup', $c->find( 'demo_notice' )->html, '<p>Careful.</p>' );
@@ -656,6 +668,92 @@ $roots->setValue( null, $saved_roots );
 $booted->setValue( null, $saved_booted );
 
 check( 'boot is deferred to plugins_loaded', isset( $GLOBALS['hooks']['plugins_loaded'] ), true );
+
+
+// ==================================================== Migrations component ==
+echo "migrations — ordering and recording\n";
+$mig_ran = array();
+$mig_a = WpPackages_Registry::migrations( 'mig', array( 'version' => '2.0.0', 'option' => 'mig_ver' ) );
+// Registered out of order on purpose: they must apply by version, not by
+// registration order.
+$mig_a->add( '1.2.0', function () use ( &$mig_ran ) { $mig_ran[] = '1.2.0'; } );
+$mig_a->add( '1.0.0', function () use ( &$mig_ran ) { $mig_ran[] = '1.0.0'; } );
+$mig_a->add( '1.10.0', function () use ( &$mig_ran ) { $mig_ran[] = '1.10.0'; } );
+
+$mig_r = $mig_a->run();
+check( 'applied in version order, not registration order', $mig_ran, array( '1.0.0', '1.2.0', '1.10.0' ) );
+check( 'version compare is semantic (1.10 after 1.2)', $mig_ran[2], '1.10.0' );
+check( 'report lists what ran', $mig_r['applied'], array( '1.0.0', '1.2.0', '1.10.0' ) );
+check( 'highest applied version recorded', $GLOBALS['options']['mig_ver'], '1.10.0' );
+
+$mig_ran = array();
+check( 'a second run does nothing', $mig_a->run()['applied'], array() );
+check( 'and nothing re-ran', $mig_ran, array() );
+check( 'has_pending() is false once done', $mig_a->has_pending(), false );
+
+echo "migrations — only what is due\n";
+$mig_ran = array();
+$GLOBALS['options']['part_ver'] = '1.0.0';
+$mig_p = WpPackages_Registry::migrations( 'part', array( 'version' => '2.0.0', 'option' => 'part_ver' ) );
+$mig_p->add( '0.9.0', function () use ( &$mig_ran ) { $mig_ran[] = 'old'; } );
+$mig_p->add( '1.0.0', function () use ( &$mig_ran ) { $mig_ran[] = 'equal'; } );
+$mig_p->add( '1.5.0', function () use ( &$mig_ran ) { $mig_ran[] = 'new'; } );
+$mig_p->run();
+check( 'skips versions already applied', $mig_ran, array( 'new' ) );
+
+echo "migrations — never runs ahead of the code\n";
+$mig_ran = array();
+$mig_d = WpPackages_Registry::migrations( 'down', array( 'version' => '1.0.0', 'option' => 'down_ver' ) );
+$mig_d->add( '1.0.0', function () use ( &$mig_ran ) { $mig_ran[] = 'current'; } );
+$mig_d->add( '2.0.0', function () use ( &$mig_ran ) { $mig_ran[] = 'future'; } );
+$mig_d->run();
+check( 'a rolled-back plugin skips newer migrations', $mig_ran, array( 'current' ) );
+check( 'and records only what it applied', $GLOBALS['options']['down_ver'], '1.0.0' );
+
+echo "migrations — unfinished work resumes\n";
+$mig_calls = 0;
+$mig_b = WpPackages_Registry::migrations( 'batch', array( 'version' => '1.0.0', 'option' => 'batch_ver' ) );
+$mig_b->add( '0.5.0', function () use ( &$mig_calls ) { $mig_calls++; return $mig_calls >= 3; } );  // false twice
+$mig_b->add( '0.6.0', function () use ( &$mig_ran ) { $mig_ran[] = 'later'; } );
+$mig_ran = array();
+$mig_b->run();
+check( 'returning false leaves the version unrecorded', isset( $GLOBALS['options']['batch_ver'] ), false );
+check( 'and stops later migrations running on half-migrated data', $mig_ran, array() );
+$mig_b->run(); $mig_b->run();
+check( 'it resumes until it reports done', $mig_calls, 3 );
+check( 'then records and continues', $GLOBALS['options']['batch_ver'], '0.6.0' );
+
+echo "migrations — failure\n";
+$mig_f = WpPackages_Registry::migrations( 'fail', array( 'version' => '1.0.0', 'option' => 'fail_ver' ) );
+$mig_f->add( '0.1.0', function () { return true; } );
+$mig_f->add( '0.2.0', function () { throw new \RuntimeException( 'disk on fire' ); } );
+$mig_f->add( '0.3.0', function () { throw new \RuntimeException( 'never reached' ); } );
+$mig_rf = $mig_f->run();
+check( 'the failure is reported', $mig_rf['failed'], 'disk on fire' );
+check( 'work completed before it is kept', $GLOBALS['options']['fail_ver'], '0.1.0' );
+check( 'and it does not carry on past the failure', $mig_rf['applied'], array( '0.1.0' ) );
+
+echo "migrations — fresh installs\n";
+$mig_ran = array();
+$mig_n = WpPackages_Registry::migrations( 'newsite', array( 'version' => '3.0.0', 'option' => 'new_ver' ) );
+$mig_n->add( '1.0.0', function () use ( &$mig_ran ) { $mig_ran[] = 'history'; } );
+check( 'baseline() stamps the current version', $mig_n->baseline(), true );
+check( 'at the running version', $GLOBALS['options']['new_ver'], '3.0.0' );
+$mig_n->run();
+check( 'so no historical migration runs on a new site', $mig_ran, array() );
+check( 'baseline() will not overwrite existing state', $mig_n->baseline(), false );
+
+echo "migrations — concurrency\n";
+$mig_c = WpPackages_Registry::migrations( 'lockme', array( 'version' => '1.0.0', 'option' => 'lock_ver' ) );
+$mig_c->add( '0.1.0', function () { return true; } );
+$GLOBALS['transients'][ \Lauzis\WpPackages\Migrations\Runner::LOCK_PREFIX . 'lockme' ] = 1;  // another request holds it
+$mig_rc = $mig_c->run();
+check( 'a second concurrent request stands down', $mig_rc['skipped'], true );
+check( 'and applies nothing', $mig_rc['applied'], array() );
+unset( $GLOBALS['transients'][ \Lauzis\WpPackages\Migrations\Runner::LOCK_PREFIX . 'lockme' ] );
+check( 'the lock is released after a run', $mig_c->run()['applied'], array( '0.1.0' ) );
+
+check( 'no migrations registered is a no-op', WpPackages_Registry::migrations( 'empty' )->run()['applied'], array() );
 
 
 // ============================================================ version gate ==

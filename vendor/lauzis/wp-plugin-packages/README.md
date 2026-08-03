@@ -10,6 +10,7 @@ splecheh, rest-in-sync, and any that follow).
 | **Toasts** | Transient floating messages raised from JavaScript. |
 | **Settings** | A settings page composed from JSON schema fragments, rendered by Carbon Fields. |
 | **Llm** | Provider-agnostic LLM calls: OpenAI, Claude, Gemini or a local command. |
+| **Migrations** | Data migrations applied once each, in version order, when a plugin updates. |
 
 They ship together, in one package behind one version gate, on purpose — see
 [Version gating](#version-gating).
@@ -182,6 +183,23 @@ Ids in a fragment are bare; the loader prefixes them so two plugins never share
 an option. `map` keeps a legacy key, `defaults` overrides a component's default,
 and `conditions` attaches conditional logic the component knows nothing about.
 
+A field's `type` is passed straight to `Field::make()`, so any Carbon Fields
+type works without the schema knowing about it. `settings` is passed on to the
+field's own `set_settings()` where it has one — a `rich_text` field takes
+`wp_editor` settings that way:
+
+```json
+{
+  "id": "email_body",
+  "type": "rich_text",
+  "title": "Email body",
+  "settings": { "media_buttons": false }
+}
+```
+
+It is ignored on types that do not accept it, so a typo cannot fatal the
+settings page.
+
 Values that cannot be JSON literals — dynamic option lists, dynamic defaults,
 generated html — use `"@callback:name"`, resolved against callbacks registered
 by name. Nothing in a schema is ever eval'd.
@@ -216,6 +234,50 @@ response shape and what to do with the result stay in the plugin.
 
 Register `WpPackages_Registry::schema( 'llm' )` to get the configuration UI —
 provider, access key, endpoint, command and timeout.
+
+## Migrations
+
+Work that has to happen when stored data no longer matches what the code
+expects — renaming an option, moving meta, backfilling a column.
+
+```php
+$migrations = WpPackages_Registry::migrations( 'my-plugin', array(
+    'version' => MY_PLUGIN_VERSION,
+    'option'  => 'my_plugin_data_version',
+) );
+
+$migrations->add( '1.2.0', array( My_Plugin_Migrations::class, 'move_settings' ) );
+$migrations->add( '1.3.0', function () { /* … */ } );
+
+$migrations->run();   // safe on every request
+```
+
+Register each migration against the plugin version that *introduced the need for
+it*. Only those newer than the recorded version run, in version order — and
+never any newer than the code currently running, so a rolled-back plugin does
+not apply migrations whose supporting code it no longer has.
+
+The applied version is recorded **after each migration**, not at the end, so a
+run that fails half way keeps the work it already did and resumes from there.
+
+**Call `baseline()` on activation.** A fresh install has no old data, and
+running the whole history against an empty site is wasted at best and wrong at
+worst. It records the current version without running anything, and refuses to
+overwrite existing state, so reactivation cannot erase migration history.
+
+```php
+register_activation_hook( __FILE__, function () {
+    WpPackages_Registry::migrations( 'my-plugin', array( 'version' => MY_PLUGIN_VERSION ) )->baseline();
+} );
+```
+
+A migration returning `false` means "not finished": the version is left
+unrecorded, later migrations are held back so they never see half-migrated data,
+and it resumes on the next request. That is how a migration too large for one
+request works through a batch at a time.
+
+Concurrent requests are handled with a short-lived lock, so two page loads
+arriving together cannot both migrate.
 
 ## Assets
 

@@ -13,3 +13,4 @@ require_once __DIR__ . '/Settings/CarbonFields.php';
 require_once __DIR__ . '/Settings/Settings.php';
 require_once __DIR__ . '/Llm/Json.php';
 require_once __DIR__ . '/Llm/Client.php';
+require_once __DIR__ . '/Migrations/Runner.php';
