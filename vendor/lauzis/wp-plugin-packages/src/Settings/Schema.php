@@ -124,7 +124,7 @@ class Schema {
 			'domain' => $domain,
 		);
 
-		foreach ( array( 'help_text', 'help_text_args', 'html', 'default_value', 'options', 'attributes', 'width', 'required' ) as $key ) {
+		foreach ( array( 'help_text', 'help_text_args', 'html', 'default_value', 'options', 'attributes', 'width', 'required', 'settings' ) as $key ) {
 			if ( isset( $field[ $key ] ) ) {
 				$normalized[ $key ] = $field[ $key ];
 			}

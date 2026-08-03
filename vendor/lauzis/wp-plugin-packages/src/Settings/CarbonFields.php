@@ -156,6 +156,13 @@ class CarbonFields {
 			}
 		}
 
+		// Field-type-specific configuration, e.g. the wp_editor settings a
+		// rich_text field takes. Guarded by method_exists because only some
+		// field types accept it, and a schema typo should not fatal the page.
+		if ( ! empty( $field['settings'] ) && is_array( $field['settings'] ) && method_exists( $made, 'set_settings' ) ) {
+			$made->set_settings( $field['settings'] );
+		}
+
 		if ( ! empty( $field['attributes'] ) ) {
 			foreach ( $field['attributes'] as $name => $value ) {
 				$made->set_attribute( $name, $value );
