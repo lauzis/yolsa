@@ -3,7 +3,7 @@
  * Plugin Name: YoLSA - Your Local SEO Auditor
  * Plugin URI:
  * Description: Local SEO auditing tool with keyword tracking and AI-generated meta descriptions.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author:
  * Text Domain: yolsa
  * Requires at least: 6.0
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('YOLSA_VERSION', '1.1.0');
+define('YOLSA_VERSION', '1.2.0');
 define('YOLSA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('YOLSA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('YOLSA_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/yolsa');

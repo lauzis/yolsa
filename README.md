@@ -55,3 +55,36 @@ See the **Change log** section above for detailed information about all versions
 --- initial MVP---
 
 > This project is maintained with the assistance of [Claude Code](https://claude.ai/code) and [CodeRabbit](https://coderabbit.ai).
+
+## Meta output
+
+YoLSA writes the description, Open Graph tags and document title into single
+posts and pages — but only when nothing else is doing it.
+
+It stays out of the head entirely while Yoast, Rank Math, SEOPress, All in One
+SEO, The SEO Framework or Slim SEO is active, because two plugins each emitting
+a meta description is worse than neither. The list is a guess and can only ever
+be one, so `yolsa_seo_handled_elsewhere` lets a site correct it — for a theme
+that handles SEO itself, say. The **Output meta tags** setting switches the
+whole thing off.
+
+It also says nothing at all unless a value has been stored for that post. An
+og:title derived from the post title would duplicate what most themes already
+provide, on every page, whether or not YoLSA has ever touched it.
+
+### Which value is used
+
+Reads prefer YoLSA's own key and fall back to Yoast's:
+
+```
+description = _yolsa_meta_description || _yoast_wpseo_metadesc
+```
+
+Both keys are in play because which one gets *written* depends on whether Yoast
+was active at the time. Anything generated while Yoast was installed sits under
+its key, and would otherwise disappear the moment Yoast was switched off. The
+same fallback applies to the title and both Open Graph values.
+
+A stored title replaces the document title through `pre_get_document_title`
+rather than being joined to the site name — an SEO title is a complete title,
+not a fragment.

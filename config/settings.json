@@ -10,13 +10,21 @@
           "title": "Keyword List",
           "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
           "fields": [
-            { "id": "keyword", "type": "text", "title": "Keyword" },
+            {
+              "id": "keyword",
+              "type": "text",
+              "title": "Keyword"
+            },
             {
               "id": "keyword_variations",
               "type": "complex",
               "title": "Variations",
               "fields": [
-                { "id": "keyword_variation", "type": "text", "title": "Variation" }
+                {
+                  "id": "keyword_variation",
+                  "type": "text",
+                  "title": "Variation"
+                }
               ]
             }
           ]
@@ -59,6 +67,20 @@
       ]
     },
     {
+      "id": "output",
+      "title": "Output",
+      "description": "Whether YoLSA writes the title and description tags into your pages.",
+      "fields": [
+        {
+          "id": "output_meta_tags",
+          "type": "checkbox",
+          "title": "Output meta tags",
+          "default_value": true,
+          "help_text": "Emit the meta description, Open Graph tags and document title on single posts and pages. Automatically stays out of the way while Yoast, Rank Math, SEOPress, All in One SEO, The SEO Framework or Slim SEO is active, so two plugins never both write a description."
+        }
+      ]
+    },
+    {
       "id": "crawl",
       "title": "Crawl",
       "fields": [
@@ -67,7 +89,10 @@
           "type": "text",
           "title": "Delay Between Crawl Requests (seconds)",
           "default_value": "1",
-          "attributes": { "type": "number", "min": "0" }
+          "attributes": {
+            "type": "number",
+            "min": "0"
+          }
         }
       ]
     }

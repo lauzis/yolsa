@@ -12,6 +12,7 @@ class Init
             add_action('admin_menu', [$this, 'add_menu_links'], 9);
         }
         \SeoAudit\SeoMeta::registerFallbackMeta();
+        \SeoAudit\SeoMeta::init();
         $this->setup_hooks();
         $this->setup_api_routes();
     }
