@@ -13,7 +13,7 @@ namespace Lauzis\WpPackages\Notices;
  */
 class Assets {
 
-	const VERSION = '1.10.0';
+	const VERSION = '1.11.0';
 
 	/** @var string */
 	private $root;

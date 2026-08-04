@@ -184,6 +184,54 @@ class Language {
 		return 'none';
 	}
 
+	/**
+	 * The full locale a language code corresponds to, e.g. "lv" => "lv_LV".
+	 *
+	 * A translation plugin reports a bare code but also knows the locale behind
+	 * it, and the two answer different questions: the code groups content, the
+	 * locale is what WordPress serves and what names a translation file. Asking
+	 * for one and reading the other off the current request is how a post in
+	 * Latvian ends up labelled en_US on an admin screen.
+	 *
+	 * @param string $code
+	 * @return string The locale, or the code itself if nothing knows better.
+	 */
+	public static function locale_for( $code ) {
+		$code = self::clean( $code );
+
+		if ( self::UNKNOWN === $code ) {
+			return self::locale();
+		}
+
+		$active = apply_filters( 'wpml_active_languages', null );
+
+		if ( is_array( $active ) ) {
+			foreach ( $active as $key => $language ) {
+				$reported = is_array( $language ) && isset( $language['language_code'] )
+					? $language['language_code']
+					: $key;
+
+				if ( self::clean( $reported ) === $code && ! empty( $language['default_locale'] ) ) {
+					return (string) $language['default_locale'];
+				}
+			}
+		}
+
+		if ( function_exists( 'pll_languages_list' ) ) {
+			$slugs   = (array) pll_languages_list( array( 'fields' => 'slug' ) );
+			$locales = (array) pll_languages_list( array( 'fields' => 'locale' ) );
+			$index   = array_search( $code, array_map( array( __CLASS__, 'clean' ), $slugs ), true );
+
+			if ( false !== $index && isset( $locales[ $index ] ) ) {
+				return (string) $locales[ $index ];
+			}
+		}
+
+		// No plugin to ask. The request's locale is the answer when it is the
+		// same language, and otherwise the code is the best that can be said.
+		return self::normalize( self::locale() ) === $code ? self::locale() : $code;
+	}
+
 	/** The full locale of the current request, e.g. "lv_LV". */
 	public static function locale() {
 		if ( function_exists( 'determine_locale' ) ) {

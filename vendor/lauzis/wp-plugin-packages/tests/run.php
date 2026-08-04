@@ -799,8 +799,18 @@ check( 'Assets::VERSION is in step with it', \Lauzis\WpPackages\Notices\Assets::
 WpPackages_Registry::register( '0.9.0', '/nonexistent/older.php', '/nonexistent' );
 check( 'an older copy does not win', WpPackages_Registry::active_version(), $boot_version );
 
-WpPackages_Registry::register( '1.10.0', dirname( __DIR__ ) . '/src/load.php', '/newer' );
-check( 'version compare is semantic, not lexical', WpPackages_Registry::active_version(), '1.10.0' );
+// Derived from the real version rather than written out, so a release does not
+// quietly overtake the copy this test calls "newer".
+$newer = preg_replace_callback(
+	'/^(\d+)\.(\d+)/',
+	static function ( $m ) {
+		return $m[1] . '.' . ( (int) $m[2] + 1 );
+	},
+	$boot_version
+);
+
+WpPackages_Registry::register( $newer, dirname( __DIR__ ) . '/src/load.php', '/newer' );
+check( 'version compare is semantic, not lexical', WpPackages_Registry::active_version(), $newer );
 check( 'assets follow the winning copy', WpPackages_Registry::active_root(), '/newer' );
 
 exec( 'rm -rf ' . escapeshellarg( $base ) );
@@ -822,6 +832,7 @@ check( 'current comes from the locale', Language::current(), 'lv' );
 check( 'the region is dropped', Language::normalize( 'pt_BR' ), 'pt' );
 check( 'a hyphenated tag works too', Language::normalize( 'zh-Hant' ), 'zh' );
 check( 'locale is available in full', Language::locale(), 'lv_LV' );
+check( 'the current language resolves to it', Language::locale_for( 'lv' ), 'lv_LV' );
 check( 'source says none', Language::source(), 'none' );
 check( 'not multilingual', Language::is_multilingual(), false );
 check( 'available is the one language', Language::available(), array( 'lv' ) );
@@ -835,7 +846,10 @@ add_filter( 'wpml_post_language_details', function ( $v, $post_id ) {
 	return 42 === $post_id ? array( 'language_code' => 'fr' ) : null;
 } );
 add_filter( 'wpml_active_languages', function () {
-	return array( 'en' => array( 'language_code' => 'en' ), 'de' => array( 'language_code' => 'de' ) );
+	return array(
+		'en' => array( 'language_code' => 'en', 'default_locale' => 'en_US' ),
+		'de' => array( 'language_code' => 'de', 'default_locale' => 'de_DE' ),
+	);
 } );
 check( "current is WPML's", Language::current(), 'de' );
 check( 'a post answers for itself', Language::for_post( 42 ), 'fr' );
@@ -844,6 +858,9 @@ check( 'default language', Language::default_language(), 'en' );
 check( 'available languages', Language::available(), array( 'en', 'de' ) );
 check( 'multilingual', Language::is_multilingual(), true );
 check( 'source says wpml', Language::source(), 'wpml' );
+check( 'a code resolves to its locale', Language::locale_for( 'de' ), 'de_DE' );
+check( 'and so does another', Language::locale_for( 'en' ), 'en_US' );
+check( 'an unknown code is returned as given', Language::locale_for( 'xx' ), 'xx' );
 
 section( 'Language: a plugin registered but not yet answering' );
 lang_reset();
@@ -868,7 +885,11 @@ if ( true ) {
 	function pll_current_language( $f = '' ) { return 'it'; }
 	function pll_default_language( $f = '' ) { return 'en'; }
 	function pll_get_post_language( $id, $f = '' ) { return 99 === $id ? 'nl' : false; }
-	function pll_languages_list( $a = array() ) { return array( 'en', 'it', 'nl' ); }
+	function pll_languages_list( $a = array() ) {
+		return ( isset( $a['fields'] ) && 'locale' === $a['fields'] )
+			? array( 'en_US', 'it_IT', 'nl_NL' )
+			: array( 'en', 'it', 'nl' );
+	}
 }
 
 section( 'Language: Polylang' );
@@ -879,6 +900,7 @@ check( 'an untranslated post falls back', Language::for_post( 100 ), 'it' );
 check( 'default language', Language::default_language(), 'en' );
 check( 'available languages', Language::available(), array( 'en', 'it', 'nl' ) );
 check( 'source says polylang', Language::source(), 'polylang' );
+check( 'polylang code resolves too', Language::locale_for( 'it' ), 'it_IT' );
 
 section( 'Language: WPML wins when both are somehow present' );
 lang_reset();
