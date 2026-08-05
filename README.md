@@ -1,5 +1,4 @@
-# Seo Audit
-- Seo Audit 
+# YoLSA - Your Local SEO Auditor
   - Pages and posts are validated against SEO good practices
     - Page title
     - Meta description
@@ -7,22 +6,22 @@
     - Alt tags
     - Other
   - Checks if there is not duplicate page titles or and meta descriptions
-  - Possible to generate meta description via (chatGPT) (assuming site uses Yoast Seo Plugin)
+  - Possible to generate meta description via ChatGPT
 - Keyword audit
   - Checks for keywords and if they are used exact match or phrase match
   - SEO audit shows if keywords are used in important parts of the site
-  - Lists keywords and shows how often particular keyword is used and in witch sites
-  
+  - Lists keywords and shows how often particular keyword is used and in which pages
+- Self-test page to verify core audit logic is working correctly
 
 # What it does
-- Scans content pages (pages/posts) and validates against soe best practices
+- Scans content pages (pages/posts) and validates against SEO best practices
 - Also checks if the content has keywords in important sections of the content
-- Possible to update meta description / generate it trough chatGpt, based on content of particular page
+- Possible to update meta description / generate it through ChatGPT, based on content of particular page
 - Gives "penalty" score for each content item
 
 # Prerequisites
-- ACF PRO plugin
-- Yoast Seo plugin
+- Carbon Fields (installed via Composer)
+- Yoast SEO plugin (optional — if active, Yoast meta fields are used automatically; otherwise the plugin stores meta in its own `_yolsa_*` fields)
 
 # Todos and ides
 - Get data from search tool, what are keywords that gets visits
@@ -34,34 +33,58 @@
 setting the assistant by the instructions, but only kind of.
 
 # Change log
--- version 1.0.15 ---
-- adding options for acf, to edit instructions for chat GPT
-- adding close button/link added to the popup
-- passing locale to chatgpt
 
--- version 1.0.14 ---
-- adding options for acf, to edit instructions for chat GPT
-- adding close button/link added to the popup
-- passing locale to chatgpt
+## Latest Release: Version 1.0.16 (2026-04-25)
 
+### Highlights
+- ✨ **Complete Rebranding**: Now "YoLSA - Your Local SEO Auditor"
+- 🔄 **Migrated to Carbon Fields**: No longer requires ACF PRO license
+- 📦 **Composer Integration**: Modern dependency management
+- 🎨 **Consistent Naming**: All files, constants, and references updated to "yolsa"
 
---- version 1.0.13 ---
-- refactoring classes
-- moving from conversational api to assistant api
-- some code cleanup
+### ⚠️ Important Breaking Changes
+- Settings must be re-entered (field names changed)
+- Plugin file renamed - WordPress will deactivate/reactivate plugin
+- Requires `composer install` for deployment
+- Upload directory path changed from `/seo-audit/` to `/yolsa/`
 
---- version 1.0.12 ---
-- some refactoring
-- added buttons for clearing all the cashed audit data
-- instead of auto starting audit added button for starting running the audit
-- added keyword audit page / keyword use stats page
-- added authentication to the api requests
-- local keyword flag for in the table
+See the **Change log** section above for detailed information about all versions.
 
---- version 1.0.10 ---
-- bugfixes and code cleanup
-- added table filtering / search
-- added fixed administration menu
-- keywords coming with a fallback if there is not defined for page then use default keywords
+---
 
 --- initial MVP---
+
+> This project is maintained with the assistance of [Claude Code](https://claude.ai/code) and [CodeRabbit](https://coderabbit.ai).
+
+## Meta output
+
+YoLSA writes the description, Open Graph tags and document title into single
+posts and pages — but only when nothing else is doing it.
+
+It stays out of the head entirely while Yoast, Rank Math, SEOPress, All in One
+SEO, The SEO Framework or Slim SEO is active, because two plugins each emitting
+a meta description is worse than neither. The list is a guess and can only ever
+be one, so `yolsa_seo_handled_elsewhere` lets a site correct it — for a theme
+that handles SEO itself, say. The **Output meta tags** setting switches the
+whole thing off.
+
+It also says nothing at all unless a value has been stored for that post. An
+og:title derived from the post title would duplicate what most themes already
+provide, on every page, whether or not YoLSA has ever touched it.
+
+### Which value is used
+
+Reads prefer YoLSA's own key and fall back to Yoast's:
+
+```
+description = _yolsa_meta_description || _yoast_wpseo_metadesc
+```
+
+Both keys are in play because which one gets *written* depends on whether Yoast
+was active at the time. Anything generated while Yoast was installed sits under
+its key, and would otherwise disappear the moment Yoast was switched off. The
+same fallback applies to the title and both Open Graph values.
+
+A stored title replaces the document title through `pre_get_document_title`
+rather than being joined to the site name — an SEO title is a complete title,
+not a fragment.

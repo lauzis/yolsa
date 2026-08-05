@@ -1,0 +1,63 @@
+{
+  "sections": [
+    {
+      "id": "llm",
+      "title": "AI Provider",
+      "description": "Which language model service to call, and how to reach it.",
+      "fields": [
+        {
+          "id": "llm_provider",
+          "type": "select",
+          "title": "Provider",
+          "default_value": "commandline",
+          "options": {
+            "commandline": "Commandline - local model or CLI",
+            "openai": "OpenAI",
+            "claude": "Claude",
+            "gemini": "Gemini"
+          },
+          "help_text": "How the request is made. The commandline option keeps API keys out of WordPress: the script owns its own credentials."
+        },
+        {
+          "id": "llm_command",
+          "type": "text",
+          "title": "Commandline Command",
+          "conditional_logic": [
+            { "field": "llm_provider", "value": "commandline", "compare": "=" }
+          ],
+          "help_text": "Shell command to run. A single JSON argument is appended containing the prompt and the content to process; the command must print the model's response on stdout."
+        },
+        {
+          "id": "llm_timeout",
+          "type": "text",
+          "title": "Command Timeout (seconds)",
+          "default_value": "60",
+          "attributes": { "type": "number", "min": "1" },
+          "conditional_logic": [
+            { "field": "llm_provider", "value": "commandline", "compare": "=" }
+          ],
+          "help_text": "How long a single call may take before it is killed. The server's own limits (max_execution_time, proxy read timeouts) must all exceed this for a longer value to have any effect."
+        },
+        {
+          "id": "llm_access_key",
+          "type": "text",
+          "title": "Access Key",
+          "attributes": { "type": "password" },
+          "conditional_logic": [
+            { "field": "llm_provider", "value": "commandline", "compare": "!=" }
+          ],
+          "help_text": "API token for the selected provider. Not needed, and not stored, for the commandline provider."
+        },
+        {
+          "id": "llm_endpoint",
+          "type": "text",
+          "title": "Endpoint",
+          "conditional_logic": [
+            { "field": "llm_provider", "value": "commandline", "compare": "!=" }
+          ],
+          "help_text": "Optional: override the default API endpoint for the selected provider."
+        }
+      ]
+    }
+  ]
+}

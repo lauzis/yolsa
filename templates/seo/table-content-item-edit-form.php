@@ -44,7 +44,7 @@ if ($report && !$report['meta_title_keyword_found']) {
 
     <div class="seo-more-info-container">
 
-        <div class="chat-gpt-seo-form">
+        <div class="yolsa-form">
 
             <form id="seo-description-form-<?= $id ?>" class="seo-description-form">
 
@@ -53,7 +53,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                 <textarea
                         name="meta_description"
                         id="seo-description-<?= $id; ?>"
-                ><?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?></textarea>
+                ><?= \SeoAudit\SeoMeta::getMetaDescription($id) ?></textarea>
 
                 <div class="button-row">
                     <a
@@ -82,7 +82,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                                 <br/>
                                 <br/>
                                 <ul>
-                                    <?php foreach ($report['keywords'] as $keyword): ?>
+                                    <?php if (!empty($report['keywords'])): foreach ($report['keywords'] as $keyword): ?>
 
                                         <li>
                                             <label>
@@ -110,7 +110,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                                         </li>
 
 
-                                    <?php endforeach; ?>
+                                    <?php endforeach; endif; ?>
                                 </ul>
                             </li>
 
@@ -125,15 +125,15 @@ if ($report && !$report['meta_title_keyword_found']) {
 
         <p>
             <strong>Post title </strong>:<?= get_the_title($id); ?> <br/>
-            <strong>Title (title tag in header)</strong>: <?= $report['meta_title_text']; ?> <br/>
-            <strong>H1</strong>: <?= $report['h1_text']; ?> <br/>
-            <strong>First paragraph</strong>: <?= $report['first_paragraph']; ?> <br/>
-            <strong>Meta description</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
-            <strong>Keywords</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
+            <strong>Title (title tag in header)</strong>: <?= $report ? $report['meta_title_text'] : ''; ?> <br/>
+            <strong>H1</strong>: <?= $report ? $report['h1_text'] : ''; ?> <br/>
+            <strong>First paragraph</strong>: <?= $report ? $report['first_paragraph'] : ''; ?> <br/>
+            <strong>Meta description</strong>: <?= \SeoAudit\SeoMeta::getMetaDescription($id) ?> <br/>
+            <strong>Keywords</strong>: <?= \SeoAudit\SeoMeta::getMetaDescription($id) ?> <br/>
             <strong>Keywords found</strong>:
 
         <ul class="found-keywords">
-            <?php foreach ($report['keywords'] as $keyword): ?>
+            <?php if (!empty($report['keywords'])): foreach ($report['keywords'] as $keyword): ?>
                 <li>
                     <?php if ($keyword['count'] > 0): ?>
                         <?= $keyword['keyword']; ?> (<?= $keyword['count']; ?>) found in:
@@ -167,7 +167,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                     </ul>
                 </li>
 
-            <?php endforeach; ?>
+            <?php endforeach; endif; ?>
         </ul>
 
         <br/>

@@ -12,7 +12,7 @@
     <?php $id = $item->ID; ?>
 
 
-<?php include(CHAT_GPT_SEO_PLUGIN_DIR.'/templates/seo/table-content-item.php'); ?>
+<?php include(YOLSA_PLUGIN_DIR.'/templates/seo/table-content-item.php'); ?>
 
 <?php endforeach; ?>
 

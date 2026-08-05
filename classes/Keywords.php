@@ -7,12 +7,12 @@ class Keywords
 
     private function get_api_settings():array
     {
-        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
-        $token = get_field('chat_gpt_seo_test_token', 'option');;
-        $url = get_field('chat_gpt_seo_test_url', 'option');;
+        $test_mode = carbon_get_theme_option('yolsa_test_mode');
+        $token = carbon_get_theme_option('chat_gpt_seo_test_token');
+        $url = carbon_get_theme_option('yolsa_test_url');
         if (!$test_mode) {
-            $token = get_field('chat_gpt_seo_live_token', 'option');
-            $url = get_field('chat_gpt_seo_live_url', 'option');;
+            $token = carbon_get_theme_option('chat_gpt_seo_live_token');
+            $url = carbon_get_theme_option('yolsa_live_url');
         }
         return ['token' => $token, 'url' => $url];
     }
@@ -56,7 +56,7 @@ class Keywords
             $html = $html_from_file;
             $report = $report_from_file;
         } else {
-            $sleepTimer = get_field('delay_between_crawl_request', 'option') ?? 1;
+            $sleepTimer = carbon_get_theme_option('delay_between_crawl_request') ?? 1;
             if ($sleepTimer>-1){
                 sleep($sleepTimer);
             }
@@ -100,12 +100,11 @@ class Keywords
         $data = $request->get_json_params();
         $meta_description = $data['meta_description'];
 
-        update_post_meta($id, '_yoast_wpseo_metadesc', $meta_description);
+        \SeoAudit\SeoMeta::setMetaDescription($id, $meta_description);
 
 
         return [
             'id' => $id,
-            'json' => $json,
             'meta_description' => $meta_description
         ];
     }
@@ -130,9 +129,20 @@ class Keywords
 
 
 
-        $ChatBot = new SeoAudit\ChatBot();
         // Send the message to our AI.
-        $resMessage = $ChatBot->sendMessage($content, $keywords,  $force_keyword);
+        $resMessage = MetaDescription::generate($content, $keywords, $force_keyword);
+
+        if (is_wp_error($resMessage)) {
+            return [
+                'id'      => $id,
+                'content' => $content,
+                'data'    => $data,
+                'keywords' => $keywords,
+                'response' => $resMessage->get_error_message(),
+                'status'  => 'error',
+            ];
+        }
+
         if ($resMessage){
             return [
                 'id' => $id,
@@ -143,7 +153,6 @@ class Keywords
                 'status'=>'ok'
             ];
         }
-        //$jsonResponse = json_encode(array("responseMessage" => $resMessage));
         return [
             'id' => $id,
             'content'=>$content,

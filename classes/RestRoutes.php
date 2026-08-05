@@ -28,12 +28,11 @@ class RestRoutes
         $data = $request->get_json_params();
         $meta_description = $data['meta_description'];
 
-        update_post_meta($id, '_yoast_wpseo_metadesc', $meta_description);
+        \SeoAudit\SeoMeta::setMetaDescription($id, $meta_description);
 
 
         return [
             'id' => $id,
-            'json' => $json,
             'meta_description' => $meta_description
         ];
     }
@@ -64,43 +63,67 @@ class RestRoutes
 
         $content = \SeoAudit\Helpers::clean_html($content);
 
-        $ChatBot = new \SeoAudit\ChatGptApi();
         // Send the message to our AI.
-        $resMessage = $ChatBot->generate_meta_description($content, $keywords,  $force_keyword, $lang);
+        $resMessage = \SeoAudit\MetaDescription::generate($content, $keywords, $force_keyword, (string) $lang);
+
+        if (is_wp_error($resMessage)) {
+            return [
+                'id'       => $id,
+                'content'  => $content,
+                'data'     => $data,
+                'keywords' => $keywords,
+                'response' => $resMessage->get_error_message(),
+                'status'   => 'error',
+            ];
+        }
+
         if ($resMessage){
             return [
-                'aaaaaa'=>'beeeeeeee',
                 'id' => $id,
                 'content'=>$content,
                 'data'=>$data,
                 'keywords' => $keywords,
-                'response'=>$resMessage['message'],
-                'status'=>'ok',
-                'debug'=>$resMessage['debug'],
-                'resMessage'=>$resMessage,
-                'chatBot'=>json_encode($ChatBot)
+                'response'=>$resMessage,
+                'status'=>'ok'
             ];
         }
-        //$jsonResponse = json_encode(array("responseMessage" => $resMessage));
+        // The model returned nothing usable but did not report an error.
         return [
-            'ccccccccccccccc'=>'dddddddddddddddddddddddd',
-            'id' => $id,
-            'content'=>$content,
-            'data'=>$data,
+            'id'       => $id,
+            'content'  => $content,
+            'data'     => $data,
             'keywords' => $keywords,
-            'response'=>"Pleace check if you have valid ChatGpt token",
-            'status'=>'failed',
-            'debug'=>$resMessage['debug'],
-            'resMessage'=>$resMessage,
-            'chatBot'=>json_encode($ChatBot)
+            'response' => __('The AI provider returned an empty response. Check the provider settings.', 'yolsa'),
+            'status'   => 'failed',
         ];
     }
 
+    public static function run_self_tests(\WP_REST_Request $request): array
+    {
+        $tests = $request->get_param('tests');
+        if (!is_array($tests)) {
+            $tests = !empty($tests) ? [$tests] : array_keys(SelfTest::get_all_tests());
+        }
+
+        $all_tests = SelfTest::get_all_tests();
+        $results = [];
+        foreach ($tests as $id) {
+            $id = sanitize_key($id);
+            if (isset($all_tests[$id])) {
+                $results[$id] = [
+                    'label' => $all_tests[$id]['label'],
+                    'result' => SelfTest::run_test($id),
+                ];
+            }
+        }
+        return $results;
+    }
+
     public static function clear_audit_data() {
-        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
+        $files = scandir(YOLSA_REPORT_DIR);
         foreach($files as $file){
             if ($file!=='.' && $file!=='..'){
-                unlink(CHAT_GPT_SEO_REPORT_DIR."/".$file);
+                unlink(YOLSA_REPORT_DIR."/".$file);
             }
         }
     }

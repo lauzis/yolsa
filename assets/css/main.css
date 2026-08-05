@@ -18,37 +18,37 @@ ul.soe-chat-gpt-keyword-list li {
     padding: 15px;
 }
 
-.chat-gpt-seo-table, .chat-gpt-keywords-table {
+.yolsa-table, .yolsa-keywords-table {
     background-color: white;
     border-radius: 10px;
     width: 100%;
 }
 
-.chat-gpt-seo-table th,
-.chat-gpt-keywords-table th,
-.chat-gpt-seo-table td,
-.chat-gpt-keywords-table td {
+.yolsa-table th,
+.yolsa-keywords-table th,
+.yolsa-table td,
+.yolsa-keywords-table td {
     padding: 7px 15px;
     text-align: center;
 }
 
-.chat-gpt-seo-table th,
-.chat-gpt-keywords-table th {
+.yolsa-table th,
+.yolsa-keywords-table th {
     font-size: 14px;
 }
 
-.chat-gpt-seo-table tr:hover td,
-.chat-gpt-keywords-table tr:hover td {
+.yolsa-table tr:hover td,
+.yolsa-keywords-table tr:hover td {
     background-color: lightblue;
 }
 
-.chat-gpt-seo-table tr:nth-child(2n),
-.chat-gpt-keywords-table tr:nth-child(2n) {
+.yolsa-table tr:nth-child(2n),
+.yolsa-keywords-table tr:nth-child(2n) {
     background-color: lightcyan;
 }
 
-.chat-gpt-seo-table tr:nth-child(2n):hover td,
-.chat-gpt-keywords-table tr:nth-child(2n):hover td {
+.yolsa-table tr:nth-child(2n):hover td,
+.yolsa-keywords-table tr:nth-child(2n):hover td {
     background-color: lightblue;
 }
 
@@ -151,7 +151,7 @@ ul.found-in-places li {
     font-size: 12px;
 }
 
-.chat-gpt-seo-status-wrap {
+.yolsa-status-wrap {
     width: 100%;
     height: 20px;
     overflow: hidden;
@@ -162,7 +162,7 @@ ul.found-in-places li {
     margin: 30px 0;
 }
 
-.chat-gpt-seo-status {
+.yolsa-status {
     width: 0;
     height: 20px;
     overflow: hidden;

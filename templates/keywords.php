@@ -2,12 +2,12 @@
     Keyword audit
 </h1>
 <?php
-$files = scandir(CHAT_GPT_SEO_REPORT_DIR);
+$files = scandir(YOLSA_REPORT_DIR);
 
 $summary_data = [];
 $total_items = 0;
 foreach ($files as $file) {
-    $full_path = CHAT_GPT_SEO_REPORT_DIR . "/" . $file;
+    $full_path = YOLSA_REPORT_DIR . "/" . $file;
     $ext = \SeoAudit\Helpers::getFileExtension($full_path);
     if ($ext === "json" && substr_count(".prev.", $full_path) == 0) {
         $total_items ++;
@@ -63,7 +63,7 @@ foreach ($files as $file) {
     <?php if(count($summary_data)===0): ?>
     <h2>Looks like there is no data. Please run Seo audit first!</h2>
     <?php else: ?>
-    <table class="chat-gpt-keywords-table">
+    <table class="yolsa-keywords-table">
         <thead>
         <tr>
             <th>

@@ -1,0 +1,45 @@
+/* Dismiss affordance for wp-notices admin notices. WordPress styles .notice
+   itself; this only restores the dismiss button, which core renders only for
+   notices it manages. */
+
+.wp-notices-notice {
+	position: relative;
+	padding-right: 38px;
+}
+
+.wp-notices-notice .notice-dismiss {
+	position: absolute;
+	top: 0;
+	right: 1px;
+	display: block;
+	padding: 9px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: #787c82;
+}
+
+.wp-notices-notice .notice-dismiss:hover,
+.wp-notices-notice .notice-dismiss:focus {
+	color: #1d2327;
+}
+
+.wp-notices-notice .notice-dismiss::before {
+	content: "\f153";
+	font: normal 16px/20px dashicons;
+	display: block;
+	width: 20px;
+	height: 20px;
+	speak: never;
+	-webkit-font-smoothing: antialiased;
+}
+
+.wp-notices-notice .notice-dismiss .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

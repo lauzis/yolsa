@@ -1,0 +1,24 @@
+{
+    "name": "lauzis/yolsa",
+    "description": "YoLSA - Your Local SEO Auditor WordPress Plugin",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=8.0",
+        "htmlburger/carbon-fields": "^3.0",
+        "lauzis/wp-plugin-packages": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "SeoAudit\\": "classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/lauzis/wp-plugin-packages"
+        }
+    ]
+}
