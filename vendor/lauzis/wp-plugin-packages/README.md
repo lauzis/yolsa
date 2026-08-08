@@ -311,6 +311,26 @@ A registered filter that returns nothing is not treated as an answer — that is
 WPML before it has finished setting up, and it falls through to the locale
 rather than reporting no language at all.
 
+## Footer
+
+Puts a plugin's version in the admin footer, on its own pages.
+
+```php
+Footer::show( 'my-plugin', array(
+    'name'    => 'My Plugin',
+    'version' => MY_PLUGIN_VERSION,
+    'types'   => array( 'my_cpt' ),   // optional: its edit screens too
+) );
+```
+
+WordPress already prints its own version there, which is where anyone looks for
+"what is running" — a plugin's version is otherwise only on the Plugins screen,
+two clicks from the page where the question comes up. Appended rather than
+substituted, because knowing both is the point.
+
+Shown on pages whose `page` parameter starts with the slug, plus the edit
+screens of any post types given. A `screen` callback overrides both.
+
 ## Assets
 
 The CSS and JS ship in `assets/` and are enqueued from

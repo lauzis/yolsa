@@ -15,4 +15,4 @@
 
 require_once __DIR__ . '/src/Registry.php';
 
-WpPackages_Registry::register( '1.11.0', __DIR__ . '/src/load.php', __DIR__ );
+WpPackages_Registry::register( '1.12.0', __DIR__ . '/src/load.php', __DIR__ );

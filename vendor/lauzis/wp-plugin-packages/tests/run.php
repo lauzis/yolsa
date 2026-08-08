@@ -41,6 +41,7 @@ function update_user_meta( $u, $k, $v ) { $GLOBALS['user_meta'][ $u ][ $k ] = $v
 function get_current_user_id() { return $GLOBALS['user_id']; }
 function current_user_can( $c ) { return $GLOBALS['caps']; }
 function esc_attr( $s ) { return htmlspecialchars( $s, ENT_QUOTES, 'UTF-8' ); }
+function esc_html( $s ) { return htmlspecialchars( $s, ENT_QUOTES, 'UTF-8' ); }
 function esc_html__( $s, $d = 'default' ) { return htmlspecialchars( $s, ENT_QUOTES, 'UTF-8' ); }
 function __( $s, $d = 'default' ) { $GLOBALS['translated'][] = array( $s, $d ); return $s; }
 // Approximates wp_kses_post()'s allow-list: block and inline markup through, scripts out.
@@ -907,6 +908,52 @@ lang_reset();
 add_filter( 'wpml_current_language', function () { return 'de'; } );
 check( 'wpml takes precedence', Language::current(), 'de' );
 check( 'and is named as the source', Language::source(), 'wpml' );
+
+// ------------------------------------------------------------------ Footer --
+
+use Lauzis\WpPackages\Admin\Footer;
+
+function footer_text( $text = 'Version 6.9' ) {
+	return apply_filters( 'update_footer', $text );
+}
+
+section( 'Footer: on the plugin\'s own pages' );
+$GLOBALS['filters'] = array();
+$_GET = array( 'page' => 'demo-settings' );
+Footer::show( 'demo', array( 'name' => 'Demo', 'version' => '2.1.0' ) );
+check( 'the version is appended', false !== strpos( footer_text(), 'Demo 2.1.0' ), true );
+check( "WordPress's own is kept", false !== strpos( footer_text(), 'Version 6.9' ), true );
+
+section( 'Footer: elsewhere in the admin' );
+$_GET = array( 'page' => 'some-other-plugin' );
+check( 'left alone', footer_text(), 'Version 6.9' );
+$_GET = array();
+check( 'and on a page with no page parameter', footer_text(), 'Version 6.9' );
+
+section( 'Footer: an empty footer' );
+$_GET = array( 'page' => 'demo-settings' );
+check( 'stands on its own without a separator', footer_text( '' ), '<span class="wp-packages-version">Demo 2.1.0</span>' );
+
+section( 'Footer: a plugin with no version says nothing' );
+$GLOBALS['filters'] = array();
+$_GET = array( 'page' => 'quiet-page' );
+Footer::show( 'quiet', array( 'name' => 'Quiet' ) );
+check( 'nothing appended', footer_text(), 'Version 6.9' );
+
+section( 'Footer: registering twice does not double up' );
+$GLOBALS['filters'] = array();
+$_GET = array( 'page' => 'twice-page' );
+Footer::show( 'twice', array( 'name' => 'Twice', 'version' => '1.0.0' ) );
+Footer::show( 'twice', array( 'name' => 'Twice', 'version' => '1.0.0' ) );
+check( 'shown once', substr_count( footer_text(), 'Twice 1.0.0' ), 1 );
+
+section( 'Footer: a screen callback overrides the page check' );
+$GLOBALS['filters'] = array();
+$_GET = array();
+Footer::show( 'callback', array( 'name' => 'CB', 'version' => '3.0.0', 'screen' => function () { return true; } ) );
+check( 'the callback decides', false !== strpos( footer_text(), 'CB 3.0.0' ), true );
+
+$_GET = array();
 
 echo "\n$pass passed, $fail failed\n";
 exit( $fail > 0 ? 1 : 0 );

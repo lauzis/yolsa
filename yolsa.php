@@ -62,3 +62,19 @@ add_action('plugins_loaded', function () {
 register_activation_hook(__FILE__, function () {
     wp_mkdir_p(YOLSA_UPLOAD_DIR);
 });
+
+// The plugin's version in the admin footer, beside WordPress's own — the first
+// thing worth knowing about a page misbehaving is which version drew it.
+add_action( 'admin_init', static function () {
+    if ( ! class_exists( '\\Lauzis\\WpPackages\\Admin\\Footer' ) ) {
+        return;
+    }
+
+    \Lauzis\WpPackages\Admin\Footer::show(
+        'yolsa',
+        array(
+            'name'    => 'YoLSA',
+            'version' => defined( 'YOLSA_VERSION' ) ? YOLSA_VERSION : '',
+        )
+    );
+} );

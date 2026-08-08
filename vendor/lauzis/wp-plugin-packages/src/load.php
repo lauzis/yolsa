@@ -15,3 +15,4 @@ require_once __DIR__ . '/Llm/Json.php';
 require_once __DIR__ . '/Llm/Client.php';
 require_once __DIR__ . '/Migrations/Runner.php';
 require_once __DIR__ . '/I18n/Language.php';
+require_once __DIR__ . '/Admin/Footer.php';
