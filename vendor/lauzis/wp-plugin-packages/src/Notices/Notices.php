@@ -11,6 +11,14 @@ namespace Lauzis\WpPackages\Notices;
  */
 class Notices {
 
+	/**
+	 * Handle for this package's own notice assets.
+	 *
+	 * Namespaced because a bare, plausible handle is exactly the kind that
+	 * WordPress or another plugin has already taken.
+	 */
+	const HANDLE = 'wp-packages-notices';
+
 	/** @var string */
 	private $slug;
 
@@ -140,11 +148,15 @@ class Notices {
 			return;
 		}
 
-		wp_enqueue_style( 'wp-notices', $this->assets->url( 'notices.css' ), array(), Assets::VERSION );
-		wp_enqueue_script( 'wp-notices', $this->assets->url( 'notices.js' ), array(), Assets::VERSION, true );
+		// Not "wp-notices": WordPress registers that handle itself, for
+		// @wordpress/notices. wp_enqueue_script() will not re-register an
+		// existing handle, so core's script loaded instead of this one and
+		// nothing was listening when a notice's dismiss button was pressed.
+		wp_enqueue_style( self::HANDLE, $this->assets->url( 'notices.css' ), array(), Assets::VERSION );
+		wp_enqueue_script( self::HANDLE, $this->assets->url( 'notices.js' ), array(), Assets::VERSION, true );
 
 		wp_localize_script(
-			'wp-notices',
+			self::HANDLE,
 			'wpNotices' . $this->key,
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),

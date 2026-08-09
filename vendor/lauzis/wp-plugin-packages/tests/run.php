@@ -341,7 +341,7 @@ $override = new \Lauzis\WpPackages\Notices\Assets( '/anywhere', 'https://cdn.tes
 check( 'explicit assets_url wins', $override->url( 'notices.css' ), 'https://cdn.test/a/notices.css' );
 
 $n->enqueue();
-check( 'enqueues the stylesheet', isset( $GLOBALS['enqueued']['wp-notices'] ), true );
+check( 'enqueues the stylesheet', isset( $GLOBALS['enqueued'][ Lauzis\WpPackages\Notices\Notices::HANDLE ] ), true );
 check( 'localises per-plugin config', $GLOBALS['localized']['wpNoticessplecheh']['action'], 'splecheh_dismiss_notice' );
 check( 'nonce matches the action', $GLOBALS['localized']['wpNoticessplecheh']['nonce'], 'nonce-splecheh_dismiss_notice' );
 
@@ -953,6 +953,23 @@ $_GET = array();
 Footer::show( 'callback', array( 'name' => 'CB', 'version' => '3.0.0', 'screen' => function () { return true; } ) );
 check( 'the callback decides', false !== strpos( footer_text(), 'CB 3.0.0' ), true );
 
+$_GET = array();
+
+section( 'Notices: the asset handle does not collide with core' );
+// WordPress registers "wp-notices" for @wordpress/notices, and
+// wp_enqueue_script() will not re-register an existing handle — so a bare name
+// meant core's script loaded and no dismiss button worked anywhere.
+check( 'handle is namespaced', Lauzis\WpPackages\Notices\Notices::HANDLE, 'wp-packages-notices' );
+check( 'and is not a core handle', in_array( Lauzis\WpPackages\Notices\Notices::HANDLE, array( 'wp-notices', 'notices', 'common' ), true ), false );
+
+$GLOBALS['enqueued'] = array();
+// The page has to start with the slug, or the screen guard declines — which
+// is the behaviour tested elsewhere.
+$_GET = array( 'page' => 'handletest-settings' );
+$handle_notices = WpPackages_Registry::notices( 'handletest' );
+$handle_notices->enqueue();
+check( 'enqueues under its own handle', isset( $GLOBALS['enqueued'][ Lauzis\WpPackages\Notices\Notices::HANDLE ] ), true );
+check( 'and never under core\'s', isset( $GLOBALS['enqueued']['wp-notices'] ), false );
 $_GET = array();
 
 echo "\n$pass passed, $fail failed\n";
