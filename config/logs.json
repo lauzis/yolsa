@@ -1,0 +1,14 @@
+{
+  "sections": [
+    {
+      "id": "logging",
+      "fields": [
+        {
+          "id": "logs_view",
+          "type": "html",
+          "html": "@callback:yolsa_logs_view"
+        }
+      ]
+    }
+  ]
+}

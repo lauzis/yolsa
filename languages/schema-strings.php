@@ -7,11 +7,12 @@
  * Never loaded at runtime.
  *
  * Regenerate with:
- *   bin/schema-i18n --domain=yolsa --out=languages/schema-strings.php config/settings.json
+ *   bin/schema-i18n --domain=yolsa --out=languages/schema-strings.php config/settings.json config/logs.json
  */
 
 return;
 
+__( '@callback:yolsa_logs_view', 'yolsa' );
 __( 'AI Instructions', 'yolsa' );
 __( 'Appended to every request, after the content.', 'yolsa' );
 __( 'Crawl', 'yolsa' );
