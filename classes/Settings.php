@@ -61,16 +61,6 @@ class Settings
             'domain' => 'wp-plugin-packages',
         ]);
 
-        // The log itself, added to the section the package just declared so the
-        // switch and what it writes share a tab. Whether it appears at all is
-        // this plugin's decision, which is why it is registered here.
-        $page->callback('yolsa_logs_view', [Logs::class, 'panel']);
-
-        $page->register(YOLSA_PLUGIN_DIR . 'config/logs.json', [
-            'prefix' => 'yolsa_',
-            'domain' => 'yolsa',
-        ]);
-
         $page->render();
     }
 

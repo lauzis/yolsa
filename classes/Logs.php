@@ -102,48 +102,6 @@ class Logs
         return array_reverse($lines);
     }
 
-    /**
-     * The log, as a panel for the settings page.
-     *
-     * The listing is the shared package's, because every plugin here writes the
-     * same log and would otherwise grow its own reader for it. What stays here
-     * is whether to show it and what happens when somebody clears it.
-     */
-    public static function panel(): string
-    {
-        $logger = self::logger();
-
-        if (!$logger || !class_exists('\\Lauzis\\WpPackages\\Logs\\Viewer')) {
-            // An older copy of the shared package won the version race — see
-            // WpPackages_Registry. The rest of the page still works, so this
-            // says what is missing rather than fataling.
-            return '<p class="description">'
-                . esc_html__('The log reader needs a newer copy of the shared package than the one running.', 'yolsa')
-                . '</p>';
-        }
-
-        $viewer = new \Lauzis\WpPackages\Logs\Viewer($logger, ['clear' => 'yolsa_clear_logs']);
-
-        return $viewer->render();
-    }
-
-    /** Empties the log, from the button on that panel. */
-    public static function handleClear(): void
-    {
-        if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You are not allowed to do that.', 'yolsa'));
-        }
-
-        check_admin_referer('yolsa_clear_logs');
-
-        self::add('logs', 'Log cleared from the settings page.', ['user' => get_current_user_id()]);
-        self::clear();
-
-        // Back where the button was, whichever screen carried the panel.
-        wp_safe_redirect(wp_get_referer() ?: admin_url());
-        exit;
-    }
-
     /** Deletes every daily log file. */
     public static function clear(): bool
     {
