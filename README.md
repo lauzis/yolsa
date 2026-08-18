@@ -34,7 +34,14 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
-## Latest Release: Version 1.0.16 (2026-04-25)
+## Version 1.3.0
+
+- Log entries can be sent to **Slack**. Two fields on the Logging settings: an incoming webhook URL, and whether Slack gets errors only (the default) or every entry. Errors are posted even with file logging switched off — an audit runs unattended, so a failure that only reaches a log file is a failure nobody reads until the next time somebody opens the Logs page.
+- Sending is fire-and-forget, so an audit never waits on Slack; the trade-off is that a webhook Slack rejects fails quietly. Only `https://` URLs are used, since the webhook URL is itself a credential.
+- "Every log entry" means one request per entry against a webhook Slack rate-limits to about a message a second, so it suits a specific investigation rather than everyday use.
+- Bundled shared library updated to wp-plugin-packages 1.15.0.
+
+## Version 1.0.16 (2026-04-25)
 
 ### Highlights
 - ✨ **Complete Rebranding**: Now "YoLSA - Your Local SEO Auditor"
