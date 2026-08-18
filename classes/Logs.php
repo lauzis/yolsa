@@ -32,6 +32,31 @@ class Logs
     }
 
     /**
+     * The Slack test button, or null when the package is absent or older than
+     * the version that added it.
+     *
+     * @return \Lauzis\WpPackages\Logs\SlackTester|null
+     */
+    public static function slackTester()
+    {
+        static $tester = null;
+
+        if (null !== $tester) {
+            return $tester;
+        }
+
+        $logger = self::logger();
+
+        if (!$logger || !class_exists('\\Lauzis\\WpPackages\\Logs\\SlackTester')) {
+            return null;
+        }
+
+        $tester = new \Lauzis\WpPackages\Logs\SlackTester($logger);
+
+        return $tester;
+    }
+
+    /**
      * Records an event when logging is switched on.
      *
      * @param string $action  Short label, e.g. 'meta-description'.
