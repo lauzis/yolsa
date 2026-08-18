@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb774aab84e5d69a7710a9077da8e5b9",
+    "content-hash": "5cef5c8b9b3b2294e9fabf0e1f42e72a",
     "packages": [
         {
             "name": "htmlburger/carbon-fields",
@@ -148,16 +148,16 @@
         },
         {
             "name": "lauzis/wp-plugin-packages",
-            "version": "v1.7.1",
+            "version": "v1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lauzis/wp-plugin-packages.git",
-                "reference": "639cc5b609b4880cc77d07ac1089d344baf8783d"
+                "reference": "681cd05730578eddeac2eec5bee751141f86742c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lauzis/wp-plugin-packages/zipball/639cc5b609b4880cc77d07ac1089d344baf8783d",
-                "reference": "639cc5b609b4880cc77d07ac1089d344baf8783d",
+                "url": "https://api.github.com/repos/lauzis/wp-plugin-packages/zipball/681cd05730578eddeac2eec5bee751141f86742c",
+                "reference": "681cd05730578eddeac2eec5bee751141f86742c",
                 "shasum": ""
             },
             "require": {
@@ -174,10 +174,10 @@
             ],
             "description": "Shared components for the lauzis WordPress plugins: file logging, admin notices and toasts, behind a single version gate.",
             "support": {
-                "source": "https://github.com/lauzis/wp-plugin-packages/tree/v1.7.1",
+                "source": "https://github.com/lauzis/wp-plugin-packages/tree/v1.15.0",
                 "issues": "https://github.com/lauzis/wp-plugin-packages/issues"
             },
-            "time": "2026-08-02T05:57:52+00:00"
+            "time": "2026-08-18T15:09:14+00:00"
         }
     ],
     "packages-dev": [],
