@@ -5,7 +5,7 @@
     "require": {
         "php": ">=8.0",
         "htmlburger/carbon-fields": "^3.0",
-        "lauzis/wp-plugin-packages": "^1.14"
+        "lauzis/wp-plugin-packages": "^1.15"
     },
     "autoload": {
         "psr-4": {
