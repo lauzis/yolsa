@@ -34,6 +34,10 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.3.2
+
+- Fixed: the block editor could not save any post while the plugin was active. The four SEO fields are registered for REST and every key starts with an underscore, which makes them protected meta — and WordPress defaults protected meta to an auth callback that refuses everybody. The editor posts every registered field back on save, core cannot skip one that has no stored row yet, so a post without SEO text was refused with "Sorry, you are not allowed to edit the _yolsa_meta_description custom field", administrators included. Whoever may edit the post may now edit its SEO text.
+
 ## Version 1.3.1
 
 - Added a **Send a test message** button beside the Slack webhook field. It posts to whatever is in the field, saved or not, waits for Slack's answer and reports it — log traffic is fire-and-forget, so a webhook Slack rejects otherwise fails silently.
