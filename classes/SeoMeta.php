@@ -224,30 +224,42 @@ class SeoMeta
         return '' !== $stored ? $stored : $title;
     }
 
+    /**
+     * Who may write these fields through the REST API.
+     *
+     * All four keys start with an underscore, which makes them protected meta,
+     * and WordPress defaults the auth callback of protected meta to
+     * __return_false. Registering them for REST without saying who may write
+     * them therefore blocks the block editor from saving *any* post: the editor
+     * sends every registered meta field back on save, core cannot skip a field
+     * that has no stored row yet, and the capability check then refuses it --
+     * for administrators too. Whoever may edit the post may edit its SEO text.
+     *
+     * @param bool   $allowed Whether the user can add the meta. Ignored.
+     * @param string $meta_key
+     * @param int    $post_id
+     * @return bool
+     */
+    public static function canEditMeta($allowed, $meta_key, $post_id): bool
+    {
+        return current_user_can('edit_post', $post_id);
+    }
+
     public static function registerFallbackMeta(): void
     {
+        $args = [
+            'type'          => 'string',
+            'single'        => true,
+            'show_in_rest'  => true,
+            'auth_callback' => [self::class, 'canEditMeta'],
+        ];
+
         $post_types = get_post_types(['public' => true]);
         foreach ($post_types as $post_type) {
-            register_post_meta($post_type, self::META_DESCRIPTION, [
-                'type'         => 'string',
-                'single'       => true,
-                'show_in_rest' => true,
-            ]);
-            register_post_meta($post_type, self::META_TITLE, [
-                'type'         => 'string',
-                'single'       => true,
-                'show_in_rest' => true,
-            ]);
-            register_post_meta($post_type, self::OG_TITLE, [
-                'type'         => 'string',
-                'single'       => true,
-                'show_in_rest' => true,
-            ]);
-            register_post_meta($post_type, self::OG_DESCRIPTION, [
-                'type'         => 'string',
-                'single'       => true,
-                'show_in_rest' => true,
-            ]);
+            register_post_meta($post_type, self::META_DESCRIPTION, $args);
+            register_post_meta($post_type, self::META_TITLE, $args);
+            register_post_meta($post_type, self::OG_TITLE, $args);
+            register_post_meta($post_type, self::OG_DESCRIPTION, $args);
         }
     }
 }
