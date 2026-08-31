@@ -1,37 +1,6 @@
 {
     "tabs": [
         {
-            "id": "keywords",
-            "title": "Keywords",
-            "fields": [
-                {
-                    "id": "keyword_list",
-                    "type": "complex",
-                    "title": "Keyword List",
-                    "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
-                    "fields": [
-                        {
-                            "id": "keyword",
-                            "type": "text",
-                            "title": "Keyword"
-                        },
-                        {
-                            "id": "keyword_variations",
-                            "type": "complex",
-                            "title": "Variations",
-                            "fields": [
-                                {
-                                    "id": "keyword_variation",
-                                    "type": "text",
-                                    "title": "Variation"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "id": "instructions",
             "title": "AI Instructions",
             "description": "What the model is told to do. The provider itself is configured on the AI Provider tab.",

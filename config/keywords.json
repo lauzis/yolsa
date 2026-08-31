@@ -1,0 +1,36 @@
+{
+    "tabs": [
+        {
+            "id": "keywords",
+            "title": "Keywords",
+            "fields": [
+                {
+                    "id": "keyword_list",
+                    "type": "complex",
+                    "title": "Keyword List",
+                    "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
+                    "fields": [
+                        {
+                            "id": "keyword",
+                            "type": "text",
+                            "title": "Keyword"
+                        },
+                        {
+                            "id": "keyword_variations",
+                            "type": "complex",
+                            "title": "Variations",
+                            "fields": [
+                                {
+                                    "id": "keyword_variation",
+                                    "type": "text",
+                                    "title": "Variation"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "description": "The keywords every audit is measured against. A variation counts towards the keyword it sits under, so \"darba lapas\" and \"darba lapa\" do not compete with each other."
+        }
+    ]
+}

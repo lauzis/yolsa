@@ -13,6 +13,7 @@ class Init
         }
         \SeoAudit\SeoMeta::registerFallbackMeta();
         \SeoAudit\SeoMeta::init();
+        \SeoAudit\Sitemap::init();
         $this->setup_hooks();
         $this->setup_api_routes();
     }

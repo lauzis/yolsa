@@ -34,6 +34,14 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.10.0
+
+- **An XML sitemap**, built on WordPress' own provider rather than a second implementation of one. Core has had paginated sitemaps since 5.5; what it lacks is any idea which pages this site wants hidden, and that is the part worth writing. While another SEO plugin is active YoLSA leaves core's sitemap switched off exactly as it found it — two sitemaps disagreeing about a site is worse than either.
+- The sitemap obeys the Indexing page and the per-post setting: a hidden post type or taxonomy is left out, and so is any post that asked to be hidden — including one still inheriting Yoast's `noindex`. A page telling search engines to stay away while the sitemap invites them in is the site contradicting itself.
+- Attachments are left out. Media pages carry no content of their own and are the classic way to fill a sitemap with nothing.
+- The list of hidden posts is **one cached query, rebuilt when a post is saved or deleted, when the settings are saved, and once a day** by `yolsa_sitemap_rebuild`. Expressing the same rule as a `meta_query` meant several LEFT JOINs against a large postmeta table and did not finish inside two minutes; the query behind the cache takes 0.04s. The daily pass is the backstop for what changes without anybody saving anything — a scheduled publication going live, a bulk delete, an import.
+- **The keyword list is its own page** under the YoLSA menu, and **Settings is now last** in the submenu. The keyword list is the working material of this plugin, edited far more often than the configuration; it should not sit behind a tab below it.
+
 ## Version 1.9.0
 
 - **Indexing is its own page** under the YoLSA menu, not a tab inside Settings. Which pages are missing from Google is not a preference — it is a decision about what the site shows the world, and it should be findable without remembering which tab it was on.
