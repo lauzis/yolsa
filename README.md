@@ -34,6 +34,12 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.8.0
+
+- **An Indexing tab in the settings**, so whole kinds of page can be kept out of search results without hiding them one at a time: tick the post types to hide, and the taxonomies whose archives to hide. Both lists are built from whatever this site actually has, not from a fixed list.
+- Precedence, most specific first: a post's own "Search engines" setting, then a `noindex` inherited from Yoast, then the blanket rule for its type. So "Always allow this page" overrules a hidden post type, and a hidden type does not quietly re-hide a page somebody deliberately allowed.
+- Taxonomy archives are hidden through the same `wp_robots` filter as posts, so a category listing declares `noindex, follow` — the listing stays out of the index while the posts it links to keep their own settings.
+
 ## Version 1.7.0
 
 - **`og:type` is now a dropdown** in the SEO box — Article, Website, Profile or Video — defaulting to Article. The list is short on purpose: Open Graph defines many more, but the interesting ones only mean anything alongside properties this plugin does not collect, and declaring `product` without a price says less than saying nothing.

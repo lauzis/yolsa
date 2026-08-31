@@ -1,100 +1,121 @@
 {
-  "tabs": [
-    {
-      "id": "keywords",
-      "title": "Keywords",
-      "fields": [
+    "tabs": [
         {
-          "id": "keyword_list",
-          "type": "complex",
-          "title": "Keyword List",
-          "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
-          "fields": [
-            {
-              "id": "keyword",
-              "type": "text",
-              "title": "Keyword"
-            },
-            {
-              "id": "keyword_variations",
-              "type": "complex",
-              "title": "Variations",
-              "fields": [
+            "id": "keywords",
+            "title": "Keywords",
+            "fields": [
                 {
-                  "id": "keyword_variation",
-                  "type": "text",
-                  "title": "Variation"
+                    "id": "keyword_list",
+                    "type": "complex",
+                    "title": "Keyword List",
+                    "help_text": "Keywords audited across the site. Each keyword can have variations that count towards the same keyword.",
+                    "fields": [
+                        {
+                            "id": "keyword",
+                            "type": "text",
+                            "title": "Keyword"
+                        },
+                        {
+                            "id": "keyword_variations",
+                            "type": "complex",
+                            "title": "Variations",
+                            "fields": [
+                                {
+                                    "id": "keyword_variation",
+                                    "type": "text",
+                                    "title": "Variation"
+                                }
+                            ]
+                        }
+                    ]
                 }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "instructions",
-      "title": "AI Instructions",
-      "description": "What the model is told to do. The provider itself is configured on the AI Provider tab.",
-      "fields": [
-        {
-          "id": "assistant_instructions",
-          "type": "textarea",
-          "title": "System Instructions",
-          "default_value": "You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters. The summary should always be written in the same language as the article itself.",
-          "help_text": "The system prompt sent with every request."
+            ]
         },
         {
-          "id": "assistant_keyword_instructions",
-          "type": "text",
-          "title": "Keyword Instructions",
-          "default_value": "Take into consideration using these keywords in the meta description:",
-          "help_text": "Prefix used when keywords should be considered but are not mandatory."
+            "id": "instructions",
+            "title": "AI Instructions",
+            "description": "What the model is told to do. The provider itself is configured on the AI Provider tab.",
+            "fields": [
+                {
+                    "id": "assistant_instructions",
+                    "type": "textarea",
+                    "title": "System Instructions",
+                    "default_value": "You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters. The summary should always be written in the same language as the article itself.",
+                    "help_text": "The system prompt sent with every request."
+                },
+                {
+                    "id": "assistant_keyword_instructions",
+                    "type": "text",
+                    "title": "Keyword Instructions",
+                    "default_value": "Take into consideration using these keywords in the meta description:",
+                    "help_text": "Prefix used when keywords should be considered but are not mandatory."
+                },
+                {
+                    "id": "assistant_keyword_instructions_force",
+                    "type": "text",
+                    "title": "Forced Keyword Instructions",
+                    "default_value": "The description MUST include at least one of these words or phrases:",
+                    "help_text": "Prefix used when at least one keyword must appear in the result."
+                },
+                {
+                    "id": "assistant_run_instructions",
+                    "type": "text",
+                    "title": "Run Instructions",
+                    "default_value": "Generate the meta description in the same language as the provided text. It must be under 200 characters.",
+                    "help_text": "Appended to every request, after the content."
+                }
+            ]
         },
         {
-          "id": "assistant_keyword_instructions_force",
-          "type": "text",
-          "title": "Forced Keyword Instructions",
-          "default_value": "The description MUST include at least one of these words or phrases:",
-          "help_text": "Prefix used when at least one keyword must appear in the result."
+            "id": "output",
+            "title": "Output",
+            "description": "Whether YoLSA writes the title and description tags into your pages.",
+            "fields": [
+                {
+                    "id": "output_meta_tags",
+                    "type": "checkbox",
+                    "title": "Output meta tags",
+                    "default_value": true,
+                    "help_text": "Emit the meta description, Open Graph tags and document title on single posts and pages. Automatically stays out of the way while Yoast, Rank Math, SEOPress, All in One SEO, The SEO Framework or Slim SEO is active, so two plugins never both write a description."
+                }
+            ]
         },
         {
-          "id": "assistant_run_instructions",
-          "type": "text",
-          "title": "Run Instructions",
-          "default_value": "Generate the meta description in the same language as the provided text. It must be under 200 characters.",
-          "help_text": "Appended to every request, after the content."
-        }
-      ]
-    },
-    {
-      "id": "output",
-      "title": "Output",
-      "description": "Whether YoLSA writes the title and description tags into your pages.",
-      "fields": [
+            "id": "indexing",
+            "title": "Indexing",
+            "description": "Whole kinds of page that should stay out of search results, so they do not have to be hidden one at a time. A page hidden here is still reachable by anyone with the link — this only asks search engines to leave it out.",
+            "fields": [
+                {
+                    "id": "noindex_post_types",
+                    "type": "set",
+                    "title": "Hide these post types",
+                    "options": "@callback:yolsa_post_types",
+                    "help_text": "Every post of the ticked types is hidden, unless a post says otherwise in its own SEO box."
+                },
+                {
+                    "id": "noindex_taxonomies",
+                    "type": "set",
+                    "title": "Hide these archives",
+                    "options": "@callback:yolsa_taxonomies",
+                    "help_text": "The listing pages for a taxonomy — a category or tag archive — rather than the posts in them. Worth hiding when the listings mostly repeat what the posts already say."
+                }
+            ]
+        },
         {
-          "id": "output_meta_tags",
-          "type": "checkbox",
-          "title": "Output meta tags",
-          "default_value": true,
-          "help_text": "Emit the meta description, Open Graph tags and document title on single posts and pages. Automatically stays out of the way while Yoast, Rank Math, SEOPress, All in One SEO, The SEO Framework or Slim SEO is active, so two plugins never both write a description."
+            "id": "crawl",
+            "title": "Crawl",
+            "fields": [
+                {
+                    "id": "delay_between_crawl_request",
+                    "type": "text",
+                    "title": "Delay Between Crawl Requests (seconds)",
+                    "default_value": "1",
+                    "attributes": {
+                        "type": "number",
+                        "min": "0"
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      "id": "crawl",
-      "title": "Crawl",
-      "fields": [
-        {
-          "id": "delay_between_crawl_request",
-          "type": "text",
-          "title": "Delay Between Crawl Requests (seconds)",
-          "default_value": "1",
-          "attributes": {
-            "type": "number",
-            "min": "0"
-          }
-        }
-      ]
-    }
-  ]
+    ]
 }

@@ -254,6 +254,63 @@ class SeoMeta
     }
 
     /**
+     * Post types offered on the Indexing tab.
+     *
+     * @return array<string, string> Name => label.
+     */
+    public static function postTypeOptions(): array
+    {
+        $options = [];
+
+        foreach (get_post_types(['public' => true], 'objects') as $type) {
+            if ('attachment' === $type->name) {
+                continue;
+            }
+            $options[$type->name] = $type->labels->name ?: $type->name;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Taxonomies offered on the Indexing tab.
+     *
+     * @return array<string, string> Name => label.
+     */
+    public static function taxonomyOptions(): array
+    {
+        $options = [];
+
+        foreach (get_taxonomies(['public' => true], 'objects') as $taxonomy) {
+            $options[$taxonomy->name] = $taxonomy->labels->name ?: $taxonomy->name;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Whether a whole post type was told to stay out of search results.
+     *
+     * @param string $postType
+     * @return bool
+     */
+    public static function isNoIndexPostType(string $postType): bool
+    {
+        return in_array($postType, (array) Settings::get('noindex_post_types', []), true);
+    }
+
+    /**
+     * Whether a taxonomy's archives were told to stay out of search results.
+     *
+     * @param string $taxonomy
+     * @return bool
+     */
+    public static function isNoIndexTaxonomy(string $taxonomy): bool
+    {
+        return in_array($taxonomy, (array) Settings::get('noindex_taxonomies', []), true);
+    }
+
+    /**
      * Whether this post asks to be kept out of search results.
      *
      * Three states rather than a checkbox, because a checkbox cannot say the
@@ -277,7 +334,13 @@ class SeoMeta
             return false;
         }
 
-        return '1' === trim((string) get_post_meta($postId, self::YOAST_NOINDEX, true));
+        if ('1' === trim((string) get_post_meta($postId, self::YOAST_NOINDEX, true))) {
+            return true;
+        }
+
+        // The blanket rule comes last: a post that says nothing follows its
+        // type, and a post that says "always allow" has already returned above.
+        return self::isNoIndexPostType((string) get_post_type($postId));
     }
 
     /**
@@ -292,13 +355,23 @@ class SeoMeta
      */
     public static function filterRobots($robots)
     {
-        if (!is_singular() || !self::shouldOutput()) {
+        if (!self::shouldOutput()) {
             return $robots;
         }
 
-        $postId = get_queried_object_id();
+        if (is_singular()) {
+            $postId = get_queried_object_id();
 
-        if (!$postId || !self::isNoIndex($postId)) {
+            if (!$postId || !self::isNoIndex($postId)) {
+                return $robots;
+            }
+        } elseif (is_category() || is_tag() || is_tax()) {
+            $term = get_queried_object();
+
+            if (!$term instanceof \WP_Term || !self::isNoIndexTaxonomy($term->taxonomy)) {
+                return $robots;
+            }
+        } else {
             return $robots;
         }
 
