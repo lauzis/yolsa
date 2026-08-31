@@ -34,6 +34,11 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.15.0
+
+- **Author and date archives can be hidden**, from the Indexing page. Author archives on a one-author site repeat the front page, and a search engine then has to decide which of the two is the real one; date archives rarely answer a question anybody typed.
+- Hiding author archives also drops them from the sitemap. A sitemap inviting a crawler to a page whose own robots tag turns it away is the site arguing with itself.
+
 ## Version 1.14.0
 
 - **Terms get their own SEO box.** One decision per category or tag: whether that archive belongs in search results. No title or description — a term archive already has the term's own description, and a second one to maintain is a second one to forget.

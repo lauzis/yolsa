@@ -360,6 +360,26 @@ class SeoMeta
     }
 
     /**
+     * Whether the author archives were told to stay out of search results.
+     *
+     * @return bool
+     */
+    public static function isNoIndexAuthorArchives(): bool
+    {
+        return (bool) Indexing::get('noindex_author_archives', false);
+    }
+
+    /**
+     * Whether the date archives were told to stay out of search results.
+     *
+     * @return bool
+     */
+    public static function isNoIndexDateArchives(): bool
+    {
+        return (bool) Indexing::get('noindex_date_archives', false);
+    }
+
+    /**
      * Whether a whole post type was told to stay out of search results.
      *
      * @param string $postType
@@ -450,6 +470,14 @@ class SeoMeta
             $term = get_queried_object();
 
             if (!$term instanceof \WP_Term || !self::isNoIndexTerm((int) $term->term_id, $term->taxonomy)) {
+                return $robots;
+            }
+        } elseif (is_author()) {
+            if (!self::isNoIndexAuthorArchives()) {
+                return $robots;
+            }
+        } elseif (is_date()) {
+            if (!self::isNoIndexDateArchives()) {
                 return $robots;
             }
         } else {

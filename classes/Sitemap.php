@@ -34,6 +34,11 @@ class Sitemap
         add_filter('wp_sitemaps_enabled', [self::class, 'enabled'], 20);
         add_filter('wp_sitemaps_post_types', [self::class, 'filterPostTypes'], 20);
         add_filter('wp_sitemaps_taxonomies', [self::class, 'filterTaxonomies'], 20);
+
+        // Hidden author archives should not be advertised either — a sitemap
+        // inviting a crawler to a page whose own robots tag turns it away is
+        // the site arguing with itself.
+        add_filter('wp_sitemaps_add_provider', [self::class, 'filterProviders'], 20, 2);
         add_filter('wp_sitemaps_posts_query_args', [self::class, 'excludeHiddenPosts'], 20, 2);
 
         // Multilingual sites: core builds one sitemap in one language, and
@@ -478,6 +483,22 @@ class Sitemap
         }
 
         return true;
+    }
+
+    /**
+     * Drops whole sitemap sections that have been hidden.
+     *
+     * @param \WP_Sitemaps_Provider|false $provider
+     * @param string                      $name
+     * @return \WP_Sitemaps_Provider|false
+     */
+    public static function filterProviders($provider, $name)
+    {
+        if ('users' === $name && SeoMeta::isNoIndexAuthorArchives()) {
+            return false;
+        }
+
+        return $provider;
     }
 
     /**

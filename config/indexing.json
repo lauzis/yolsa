@@ -18,6 +18,18 @@
                     "title": "Hide these archives",
                     "options": "@callback:yolsa_taxonomies",
                     "help_text": "The listing pages for a taxonomy — a category or tag archive — rather than the posts in them. Worth hiding when the listings mostly repeat what the posts already say."
+                },
+                {
+                    "id": "noindex_author_archives",
+                    "type": "checkbox",
+                    "title": "Hide author archives",
+                    "help_text": "The pages listing everything one person wrote. On a site with a single author they repeat the front page, and a search engine has to decide which of the two is the real one."
+                },
+                {
+                    "id": "noindex_date_archives",
+                    "type": "checkbox",
+                    "title": "Hide date archives",
+                    "help_text": "The pages listing everything published in a month or a year. They rarely answer a question anybody typed."
                 }
             ]
         }
