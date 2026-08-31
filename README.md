@@ -34,6 +34,13 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.14.0
+
+- **Terms get their own SEO box.** One decision per category or tag: whether that archive belongs in search results. No title or description — a term archive already has the term's own description, and a second one to maintain is a second one to forget.
+- **Hiding a kind of thing is now a default, not a verdict.** Hide every tag archive on the Indexing page, then put back the handful worth having, one at a time. The exception reaches the sitemap too: a hidden taxonomy still publishes the terms that were put back, and a hidden post type still publishes the posts that were.
+- **The boxes read the way the decision actually runs.** Where everything of a kind is hidden, the choice offered is *"Put this one in search results anyway"* rather than *"Hide this page"* — asking somebody to hide what is already hidden reads as though nothing they do there matters. Same three stored values either way.
+- Fixed a way a setting could quietly lose a value: these lists of post types and taxonomies are built when the fields are declared, on `init` at priority zero, while plugins register their own types at priority ten. A choice whose type had not registered yet was a choice the field did not recognise, and a multi-value field drops what it does not recognise when it saves. Anything already stored now stays on the list.
+
 ## Version 1.13.0
 
 - **Password-protected posts are never indexed and never listed.** A search engine reaching one sees the password form, not the article, so indexing it means ranking an empty page. This sits ahead of every other rule — "Always allow this page" cannot overrule it, because there is nothing behind it to allow. WordPress' own sitemap does not exclude them either; this one does.

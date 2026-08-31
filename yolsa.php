@@ -3,7 +3,7 @@
  * Plugin Name: YoLSA - Your Local SEO Auditor
  * Plugin URI:
  * Description: Local SEO auditing tool with keyword tracking and AI-generated meta descriptions.
- * Version: 1.13.0
+ * Version: 1.14.0
  * Author:
  * Text Domain: yolsa
  * Requires at least: 6.0
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('YOLSA_VERSION', '1.13.0');
+define('YOLSA_VERSION', '1.14.0');
 define('YOLSA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('YOLSA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('YOLSA_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/yolsa');
@@ -58,6 +58,7 @@ add_action('carbon_fields_register_fields', ['\SeoAudit\KeywordList', 'register'
 add_action('carbon_fields_register_fields', ['\SeoAudit\Indexing', 'register']);
 add_action('carbon_fields_register_fields', ['\SeoAudit\Settings', 'register']);
 add_action('carbon_fields_register_fields', ['\SeoAudit\SeoMetaBox', 'register']);
+add_action('carbon_fields_register_fields', ['\SeoAudit\TermSeoBox', 'register']);
 
 // The Slack test button answers over admin-ajax, which never renders the
 // settings page, so its endpoint is registered on every admin request.

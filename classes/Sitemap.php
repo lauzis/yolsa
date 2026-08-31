@@ -50,6 +50,8 @@ class Sitemap
         // tomorrow — and one just published should appear.
         add_action('save_post', [self::class, 'flush']);
         add_action('deleted_post', [self::class, 'flush']);
+        add_action('edited_term', [self::class, 'flush']);
+        add_action('delete_term', [self::class, 'flush']);
         add_action('carbon_fields_theme_options_container_saved', [self::class, 'flushAfterSettingsSaved']);
 
         // The daily pass is the backstop rather than the mechanism: it catches
@@ -202,8 +204,9 @@ class Sitemap
 
         $started = microtime(true);
         $hidden = self::hiddenPostIds($postType);
+        $typeHidden = SeoMeta::isNoIndexPostType($postType);
 
-        $entries = self::eachLanguage(function () use ($postType, $hidden) {
+        $entries = self::eachLanguage(function () use ($postType, $hidden, $typeHidden) {
             // Core's own arguments, filter included, so anything else hooking
             // wp_sitemaps_posts_query_args still applies — this query stands in
             // for core's, it does not get to ignore what core promised.
@@ -227,10 +230,21 @@ class Sitemap
                 $postType
             );
 
-            $args['post__not_in'] = array_values(array_unique(array_merge(
-                isset($args['post__not_in']) ? (array) $args['post__not_in'] : [],
-                $hidden
-            )));
+            if ($typeHidden) {
+                // The whole type is hidden, so the sitemap carries only what
+                // was put back by hand — the reverse of the usual exclusion.
+                $args['meta_query'] = [
+                    [
+                        'key'   => SeoMeta::ROBOTS_INDEX,
+                        'value' => 'index',
+                    ],
+                ];
+            } else {
+                $args['post__not_in'] = array_values(array_unique(array_merge(
+                    isset($args['post__not_in']) ? (array) $args['post__not_in'] : [],
+                    $hidden
+                )));
+            }
 
             $query = new \WP_Query($args);
 
@@ -294,6 +308,13 @@ class Sitemap
 
             if (is_array($terms)) {
                 foreach ($terms as $term) {
+                    // One rule for both directions: a hidden taxonomy lists the
+                    // terms put back by hand, a visible one lists all but the
+                    // terms taken out.
+                    if (SeoMeta::isNoIndexTerm((int) $term->term_id, $taxonomy)) {
+                        continue;
+                    }
+
                     $link = get_term_link($term);
 
                     if (!is_wp_error($link)) {
@@ -472,7 +493,11 @@ class Sitemap
         unset($postTypes['attachment']);
 
         foreach (array_keys((array) $postTypes) as $name) {
-            if (SeoMeta::isNoIndexPostType((string) $name)) {
+            // A hidden type is not dropped outright: a post inside it may have
+            // been put back by hand, and an override that does not reach the
+            // sitemap is only half an override. The type goes only when it
+            // would contribute nothing.
+            if (SeoMeta::isNoIndexPostType((string) $name) && !self::postUrls((string) $name)) {
                 unset($postTypes[$name]);
             }
         }
@@ -489,7 +514,9 @@ class Sitemap
     public static function filterTaxonomies($taxonomies)
     {
         foreach (array_keys((array) $taxonomies) as $name) {
-            if (SeoMeta::isNoIndexTaxonomy((string) $name)) {
+            // Same as post types: a hidden taxonomy stays if some term of it
+            // was deliberately put back.
+            if (SeoMeta::isNoIndexTaxonomy((string) $name) && !self::taxonomyUrls((string) $name)) {
                 unset($taxonomies[$name]);
             }
         }

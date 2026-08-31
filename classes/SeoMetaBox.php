@@ -75,6 +75,50 @@ class SeoMetaBox
             . esc_html($size) . ' — ' . esc_html__('the featured image.', 'yolsa') . $small . '</p>';
     }
 
+    /**
+     * Whether everything of this post's kind is hidden already.
+     *
+     * @return bool
+     */
+    private static function typeHidden(): bool
+    {
+        $postType = get_post_type(get_the_ID());
+
+        return $postType ? SeoMeta::isNoIndexPostType((string) $postType) : false;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function robotsOptions(): array
+    {
+        if (self::typeHidden()) {
+            return [
+                '' => __('Hidden — like everything of this kind', 'yolsa'),
+                'index' => __('Put this one in search results anyway', 'yolsa'),
+                'noindex' => __('Hidden', 'yolsa'),
+            ];
+        }
+
+        return [
+            '' => __('Default — whatever the site allows', 'yolsa'),
+            'noindex' => __('Hide this page from search results', 'yolsa'),
+            'index' => __('Always allow this page in search results', 'yolsa'),
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    private static function robotsHelp(): string
+    {
+        if (self::typeHidden()) {
+            return __('Everything of this kind is hidden on the Indexing page. Putting this one back also adds it to the sitemap.', 'yolsa');
+        }
+
+        return __('Default keeps any setting made in another SEO plugin for this post. A hidden page stays reachable by anyone with the link, and leaves the sitemap — this only asks search engines to leave it out.', 'yolsa');
+    }
+
     /** Declares the box. Hooked on carbon_fields_register_fields. */
     public static function register(): void
     {
@@ -133,13 +177,14 @@ class SeoMetaBox
         // Three options rather than a checkbox: unticking a box would look
         // exactly like never having touched it, and the Yoast value this falls
         // back to would then win forever.
+        //
+        // The wording follows the post type. Where everything of this kind is
+        // hidden, the decision in front of somebody is whether to put this one
+        // back — asking them to "hide" a page that is already hidden reads as
+        // though nothing they do here matters.
         $fields[] = Field::make('select', 'yolsa_robots_index', __('Search engines', 'yolsa'))
-            ->set_options([
-                '' => __('Default — whatever the site allows', 'yolsa'),
-                'noindex' => __('Hide this page from search results (noindex)', 'yolsa'),
-                'index' => __('Always allow this page in search results', 'yolsa'),
-            ])
-            ->set_help_text(__('Default keeps any setting made in another SEO plugin for this post. Hidden pages stay reachable by anyone with the link — this only asks search engines to leave them out.', 'yolsa'));
+            ->set_options(self::robotsOptions())
+            ->set_help_text(self::robotsHelp());
 
         $container->add_fields($fields);
     }

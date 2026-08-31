@@ -269,7 +269,7 @@ class SeoMeta
             $options[$type->name] = $type->labels->name ?: $type->name;
         }
 
-        return $options;
+        return self::keepStoredOptions($options, 'noindex_post_types');
     }
 
     /**
@@ -285,7 +285,78 @@ class SeoMeta
             $options[$taxonomy->name] = $taxonomy->labels->name ?: $taxonomy->name;
         }
 
+        return self::keepStoredOptions($options, 'noindex_taxonomies');
+    }
+
+    /**
+     * Adds anything already saved to a list of choices.
+     *
+     * These lists are built when the fields are declared, on `init` at priority
+     * zero, and plugins register their post types and taxonomies on `init` at
+     * priority ten. A choice whose type had not registered yet is a choice the
+     * field does not recognise — and a multi-value field drops what it does not
+     * recognise when it saves. Somebody would hide a taxonomy, save something
+     * unrelated later, and find it quietly unhidden.
+     *
+     * Whatever is stored therefore stays on the list, even when nothing has
+     * claimed the name yet.
+     *
+     * @param array<string, string> $options
+     * @param string                $setting
+     * @return array<string, string>
+     */
+    private static function keepStoredOptions(array $options, string $setting): array
+    {
+        foreach ((array) Indexing::get($setting, []) as $stored) {
+            $stored = (string) $stored;
+
+            if ('' !== $stored && !isset($options[$stored])) {
+                $options[$stored] = $stored;
+            }
+        }
+
         return $options;
+    }
+
+    /**
+     * Whether a single term asks to be indexed, hidden, or left to its taxonomy.
+     *
+     * Same three values as a post, stored in term meta under the same name.
+     *
+     * @param int $termId
+     * @return string '', 'index' or 'noindex'.
+     */
+    public static function termChoice(int $termId): string
+    {
+        $value = trim((string) get_term_meta($termId, self::ROBOTS_INDEX, true));
+
+        return in_array($value, ['index', 'noindex'], true) ? $value : '';
+    }
+
+    /**
+     * Whether a term archive should stay out of search results.
+     *
+     * The term's own choice first, then its taxonomy's. That ordering is what
+     * makes a hidden taxonomy workable: hide every tag archive, then put the
+     * handful worth having back by hand.
+     *
+     * @param int    $termId
+     * @param string $taxonomy
+     * @return bool
+     */
+    public static function isNoIndexTerm(int $termId, string $taxonomy): bool
+    {
+        $choice = self::termChoice($termId);
+
+        if ('noindex' === $choice) {
+            return true;
+        }
+
+        if ('index' === $choice) {
+            return false;
+        }
+
+        return self::isNoIndexTaxonomy($taxonomy);
     }
 
     /**
@@ -378,7 +449,7 @@ class SeoMeta
         } elseif (is_category() || is_tag() || is_tax()) {
             $term = get_queried_object();
 
-            if (!$term instanceof \WP_Term || !self::isNoIndexTaxonomy($term->taxonomy)) {
+            if (!$term instanceof \WP_Term || !self::isNoIndexTerm((int) $term->term_id, $term->taxonomy)) {
                 return $robots;
             }
         } else {
