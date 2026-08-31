@@ -34,6 +34,13 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.4.0
+
+- Added a **SEO box on the post editor**: search engine title and description, social title and description. Four fields, no score and no traffic light — the things a person editing an article actually decides.
+- The fields write straight to the keys YoLSA already reads (`_yolsa_meta_title` and friends), so a value typed here is the value the head tag renders, with no mapping in between.
+- Empty stays meaningful: a blank field falls back to whatever Yoast stored for that post, and to WordPress' own title after that. Nothing has to be filled in for the switch away from another SEO plugin to be safe.
+- While another SEO plugin owns the page head, the box says so — the values are still saved, and take effect as soon as that plugin is switched off.
+
 ## Version 1.3.2
 
 - Fixed: the block editor could not save any post while the plugin was active. The four SEO fields are registered for REST and every key starts with an underscore, which makes them protected meta — and WordPress defaults protected meta to an auth callback that refuses everybody. The editor posts every registered field back on save, core cannot skip one that has no stored row yet, so a post without SEO text was refused with "Sorry, you are not allowed to edit the _yolsa_meta_description custom field", administrators included. Whoever may edit the post may now edit its SEO text.
