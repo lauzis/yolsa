@@ -125,6 +125,11 @@ class SeoMetaBox
             ->set_rows(3)
             ->set_help_text(__('Empty uses the search engine description above.', 'yolsa'));
 
+        $fields[] = Field::make('select', 'yolsa_og_type', __('Content type', 'yolsa'))
+            ->set_options(SeoMeta::ogTypes())
+            ->set_default_value('article')
+            ->set_help_text(__('What a social network is told this page is, which decides how the share card is drawn. Left alone, a post is an article and a page is a website.', 'yolsa'));
+
         // Three options rather than a checkbox: unticking a box would look
         // exactly like never having touched it, and the Yoast value this falls
         // back to would then win forever.

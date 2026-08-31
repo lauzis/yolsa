@@ -11,6 +11,7 @@ class SeoMeta
 
     /** Yoast's equivalents, read as a fallback so older values keep working. */
     const ROBOTS_INDEX = '_yolsa_robots_index';
+    const OG_TYPE      = '_yolsa_og_type';
 
     const YOAST_META_DESCRIPTION = '_yoast_wpseo_metadesc';
     const YOAST_META_TITLE       = '_yoast_wpseo_title';
@@ -153,16 +154,43 @@ class SeoMeta
     }
 
     /**
+     * The Open Graph types worth offering.
+     *
+     * A short list on purpose. Open Graph defines a great many more, and the
+     * interesting ones (product, book, music) only mean anything alongside
+     * properties this plugin does not collect — declaring `product` without a
+     * price says less than saying nothing.
+     *
+     * @return array<string, string> Value => label.
+     */
+    public static function ogTypes(): array
+    {
+        return [
+            'article' => __('Article — a piece of writing with a publication date', 'yolsa'),
+            'website' => __('Website — a landing or overview page', 'yolsa'),
+            'profile' => __('Profile — a page about a person', 'yolsa'),
+            'video.other' => __('Video', 'yolsa'),
+        ];
+    }
+
+    /**
      * What kind of thing this page is, in Open Graph's vocabulary.
      *
-     * Only the two that mean anything here: an article, or a page. A product
-     * or a profile would need fields nobody has asked for.
+     * A stored choice wins. With nothing stored the post type decides, which
+     * keeps every page written before this field existed declaring what it
+     * always declared.
      *
      * @param int $postId
      * @return string
      */
     public static function getOgType(int $postId): string
     {
+        $stored = trim((string) get_post_meta($postId, self::OG_TYPE, true));
+
+        if ('' !== $stored && isset(self::ogTypes()[$stored])) {
+            return $stored;
+        }
+
         return 'post' === get_post_type($postId) ? 'article' : 'website';
     }
 
@@ -420,6 +448,7 @@ class SeoMeta
             register_post_meta($post_type, self::OG_TITLE, $args);
             register_post_meta($post_type, self::OG_DESCRIPTION, $args);
             register_post_meta($post_type, self::ROBOTS_INDEX, $args);
+            register_post_meta($post_type, self::OG_TYPE, $args);
         }
     }
 }

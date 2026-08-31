@@ -34,6 +34,11 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.7.0
+
+- **`og:type` is now a dropdown** in the SEO box — Article, Website, Profile or Video — defaulting to Article. The list is short on purpose: Open Graph defines many more, but the interesting ones only mean anything alongside properties this plugin does not collect, and declaring `product` without a price says less than saying nothing.
+- Left alone it behaves as before: a post is an `article`, a page is a `website`. So nothing written before this field existed changes what it declares, and an unrecognised stored value falls back to that same rule rather than being emitted.
+
 ## Version 1.6.0
 
 - **`og:image` from the featured image.** No second picture field: the featured image is the one an editor has already chosen and can see, and a second one to maintain is a second one to forget. `og:image:width`, `og:image:height` and `og:image:alt` go out with it, so a network can lay the card out before the picture has loaded.
