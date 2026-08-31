@@ -37,7 +37,7 @@ class Sitemap
         // tomorrow — and one just published should appear.
         add_action('save_post', [self::class, 'flush']);
         add_action('deleted_post', [self::class, 'flush']);
-        add_action('carbon_fields_theme_options_container_saved', [self::class, 'flush']);
+        add_action('carbon_fields_theme_options_container_saved', [self::class, 'flushAfterSettingsSaved']);
 
         // The daily pass is the backstop rather than the mechanism: it catches
         // what changes a sitemap without anybody saving a post — a scheduled
@@ -72,14 +72,49 @@ class Sitemap
         }
     }
 
-    /** Throws the lists away and builds them again, so no visitor waits for it. */
-    public static function rebuild(): void
+    /**
+     * The same, but said out loud.
+     *
+     * Hooked to the settings save rather than `flush()` itself, because
+     * `save_post` fires on every keystroke of an autosave and a log line per
+     * keystroke is a log nobody reads. Changing what the whole site hides is
+     * worth a line; editing one post is not.
+     */
+    public static function flushAfterSettingsSaved(): void
     {
         self::flush();
 
+        Logs::add('sitemap', 'Cleared the hidden-post cache after a settings save.', [
+            'post_types' => implode(', ', (array) Indexing::get('noindex_post_types', [])) ?: 'none hidden',
+            'taxonomies' => implode(', ', (array) Indexing::get('noindex_taxonomies', [])) ?: 'none hidden',
+        ]);
+    }
+
+    /** Throws the lists away and builds them again, so no visitor waits for it. */
+    public static function rebuild(): void
+    {
+        $started = microtime(true);
+
+        self::flush();
+
+        $counts = [];
+
         foreach (array_keys(get_post_types(['public' => true])) as $postType) {
-            self::hiddenPostIds($postType);
+            $counts[$postType] = count(self::hiddenPostIds($postType));
         }
+
+        $parts = [];
+
+        foreach ($counts as $postType => $count) {
+            $parts[] = $postType . ': ' . $count;
+        }
+
+        Logs::add('sitemap', 'Rebuilt the hidden-post cache.', [
+            'hidden'   => implode(', ', $parts),
+            'total'    => array_sum($counts),
+            'duration' => round((microtime(true) - $started) * 1000) . 'ms',
+            'trigger'  => wp_doing_cron() ? 'daily schedule' : 'called directly',
+        ]);
     }
 
     /**
@@ -96,6 +131,7 @@ class Sitemap
      */
     public static function hiddenPostIds(string $postType): array
     {
+        $started = microtime(true);
         $key = self::CACHE_PREFIX . $postType;
         $cached = get_transient($key);
 
@@ -123,9 +159,26 @@ class Sitemap
             $postType
         ));
 
+        if ('' !== (string) $wpdb->last_error) {
+            // An empty list would quietly put every hidden page back into the
+            // sitemap, which is the one outcome worth shouting about.
+            Logs::error('sitemap', 'Could not list the hidden posts; nothing will be excluded.', [
+                'post_type' => $postType,
+                'error'     => $wpdb->last_error,
+            ]);
+
+            return [];
+        }
+
         $ids = array_map('intval', (array) $ids);
 
         set_transient($key, $ids, self::CACHE_TTL);
+
+        Logs::add('sitemap', 'Listed the posts hidden from search.', [
+            'post_type' => $postType,
+            'hidden'    => count($ids),
+            'duration'  => round((microtime(true) - $started) * 1000) . 'ms',
+        ]);
 
         return $ids;
     }

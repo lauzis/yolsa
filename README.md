@@ -34,6 +34,12 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.11.0
+
+- **The sitemap writes to the log**, like the audit already does: one line when the list of hidden posts is built (post type, how many, how long), one when the daily rebuild finishes (totals, duration, and whether the schedule or a person triggered it), and one when a settings save clears the cache, naming what is now hidden.
+- A failed query is logged as an error rather than passing quietly. An empty list looks exactly like "nothing is hidden", which would put every hidden page back into the sitemap — the one outcome worth shouting about, so it also refuses to cache that result.
+- `save_post` deliberately does **not** log. It fires on every autosave, and a log line per keystroke is a log nobody reads.
+
 ## Version 1.10.0
 
 - **An XML sitemap**, built on WordPress' own provider rather than a second implementation of one. Core has had paginated sitemaps since 5.5; what it lacks is any idea which pages this site wants hidden, and that is the part worth writing. While another SEO plugin is active YoLSA leaves core's sitemap switched off exactly as it found it — two sitemaps disagreeing about a site is worse than either.
