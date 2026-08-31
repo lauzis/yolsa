@@ -10,10 +10,16 @@ class SeoMeta
     const OG_DESCRIPTION   = '_yolsa_og_description';
 
     /** Yoast's equivalents, read as a fallback so older values keep working. */
+    const ROBOTS_INDEX = '_yolsa_robots_index';
+
     const YOAST_META_DESCRIPTION = '_yoast_wpseo_metadesc';
     const YOAST_META_TITLE       = '_yoast_wpseo_title';
     const YOAST_OG_TITLE         = '_yoast_wpseo_opengraph-title';
     const YOAST_OG_DESCRIPTION   = '_yoast_wpseo_opengraph-description';
+
+    // Yoast's own three states, stored as strings: 1 hides the post, 2 shows it
+    // explicitly, absent or 0 means "whatever the site says".
+    const YOAST_NOINDEX = '_yoast_wpseo_meta-robots-noindex';
 
     /**
      * Plugins that emit their own title and description tags.
@@ -143,6 +149,61 @@ class SeoMeta
     {
         add_action('wp_head', [self::class, 'renderHead'], 1);
         add_filter('pre_get_document_title', [self::class, 'filterTitle'], 20);
+        add_filter('wp_robots', [self::class, 'filterRobots'], 20);
+    }
+
+    /**
+     * Whether this post asks to be kept out of search results.
+     *
+     * Three states rather than a checkbox, because a checkbox cannot say the
+     * difference between "leave it to the site" and "definitely index this".
+     * That difference matters while Yoast's values are still being inherited:
+     * unticking a box would otherwise be indistinguishable from never having
+     * touched it, and the old Yoast value would win forever.
+     *
+     * @param int $postId
+     * @return bool
+     */
+    public static function isNoIndex(int $postId): bool
+    {
+        $own = trim((string) get_post_meta($postId, self::ROBOTS_INDEX, true));
+
+        if ('noindex' === $own) {
+            return true;
+        }
+
+        if ('index' === $own) {
+            return false;
+        }
+
+        return '1' === trim((string) get_post_meta($postId, self::YOAST_NOINDEX, true));
+    }
+
+    /**
+     * Adds `noindex` for a post that asked for it.
+     *
+     * Through `wp_robots` rather than printing a tag: WordPress assembles one
+     * robots meta from every contributor, so a second printed tag would be a
+     * second, contradictory instruction.
+     *
+     * @param array $robots
+     * @return array
+     */
+    public static function filterRobots($robots)
+    {
+        if (!is_singular() || !self::shouldOutput()) {
+            return $robots;
+        }
+
+        $postId = get_queried_object_id();
+
+        if (!$postId || !self::isNoIndex($postId)) {
+            return $robots;
+        }
+
+        // wp_robots_no_robots() is the core helper for exactly this, and it
+        // also drops the previews a hidden page has no business advertising.
+        return wp_robots_no_robots($robots);
     }
 
     /**
@@ -260,6 +321,7 @@ class SeoMeta
             register_post_meta($post_type, self::META_TITLE, $args);
             register_post_meta($post_type, self::OG_TITLE, $args);
             register_post_meta($post_type, self::OG_DESCRIPTION, $args);
+            register_post_meta($post_type, self::ROBOTS_INDEX, $args);
         }
     }
 }

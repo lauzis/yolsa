@@ -34,6 +34,12 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.5.0
+
+- **Keep a page out of search results.** A "Search engines" setting in the SEO box with three options: default, hide (`noindex`), or always allow. Applied through the `wp_robots` filter, so WordPress assembles one robots tag rather than two contradictory ones.
+- Falls back to Yoast's `_yoast_wpseo_meta-robots-noindex`, so pages already hidden there stay hidden the moment Yoast is switched off — on this site that is 16 pages, including the download page and the e-mail template page.
+- Three options rather than a checkbox on purpose: unticking a box is indistinguishable from never having touched it, and the inherited Yoast value would then win forever. "Always allow" is how you overrule an old Yoast noindex.
+
 ## Version 1.4.0
 
 - Added a **SEO box on the post editor**: search engine title and description, social title and description. Four fields, no score and no traffic light — the things a person editing an article actually decides.

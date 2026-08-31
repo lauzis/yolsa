@@ -84,6 +84,17 @@ class SeoMetaBox
             ->set_rows(3)
             ->set_help_text(__('Empty uses the search engine description above.', 'yolsa'));
 
+        // Three options rather than a checkbox: unticking a box would look
+        // exactly like never having touched it, and the Yoast value this falls
+        // back to would then win forever.
+        $fields[] = Field::make('select', 'yolsa_robots_index', __('Search engines', 'yolsa'))
+            ->set_options([
+                '' => __('Default — whatever the site allows', 'yolsa'),
+                'noindex' => __('Hide this page from search results (noindex)', 'yolsa'),
+                'index' => __('Always allow this page in search results', 'yolsa'),
+            ])
+            ->set_help_text(__('Default keeps any setting made in another SEO plugin for this post. Hidden pages stay reachable by anyone with the link — this only asks search engines to leave them out.', 'yolsa'));
+
         $container->add_fields($fields);
     }
 }
