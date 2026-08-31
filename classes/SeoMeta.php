@@ -296,7 +296,7 @@ class SeoMeta
      */
     public static function isNoIndexPostType(string $postType): bool
     {
-        return in_array($postType, (array) Settings::get('noindex_post_types', []), true);
+        return in_array($postType, (array) Indexing::get('noindex_post_types', []), true);
     }
 
     /**
@@ -307,7 +307,7 @@ class SeoMeta
      */
     public static function isNoIndexTaxonomy(string $taxonomy): bool
     {
-        return in_array($taxonomy, (array) Settings::get('noindex_taxonomies', []), true);
+        return in_array($taxonomy, (array) Indexing::get('noindex_taxonomies', []), true);
     }
 
     /**

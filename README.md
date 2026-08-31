@@ -34,6 +34,11 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.9.0
+
+- **Indexing is its own page** under the YoLSA menu, not a tab inside Settings. Which pages are missing from Google is not a preference — it is a decision about what the site shows the world, and it should be findable without remembering which tab it was on.
+- Nothing moved but the screen: the same two settings, stored under the same names, so a site that had already ticked something keeps it.
+
 ## Version 1.8.0
 
 - **An Indexing tab in the settings**, so whole kinds of page can be kept out of search results without hiding them one at a time: tick the post types to hide, and the taxonomies whose archives to hide. Both lists are built from whatever this site actually has, not from a fixed list.

@@ -1,0 +1,25 @@
+{
+    "tabs": [
+        {
+            "id": "indexing",
+            "title": "Search engines",
+            "description": "Whole kinds of page that should stay out of search results, so they do not have to be hidden one at a time. A page hidden here is still reachable by anyone with the link — this only asks search engines to leave it out.",
+            "fields": [
+                {
+                    "id": "noindex_post_types",
+                    "type": "set",
+                    "title": "Hide these post types",
+                    "options": "@callback:yolsa_post_types",
+                    "help_text": "Every post of the ticked types is hidden, unless a post says otherwise in its own SEO box."
+                },
+                {
+                    "id": "noindex_taxonomies",
+                    "type": "set",
+                    "title": "Hide these archives",
+                    "options": "@callback:yolsa_taxonomies",
+                    "help_text": "The listing pages for a taxonomy — a category or tag archive — rather than the posts in them. Worth hiding when the listings mostly repeat what the posts already say."
+                }
+            ]
+        }
+    ]
+}

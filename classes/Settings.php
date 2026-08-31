@@ -43,11 +43,6 @@ class Settings
 
         // No prefix: YoLSA's option keys predate the shared loader and are kept
         // exactly as they are, so nothing stored has to move.
-        // The Indexing tab lists whatever post types and taxonomies this site
-        // actually has, which a JSON file cannot know.
-        $page->callback('yolsa_post_types', [SeoMeta::class, 'postTypeOptions']);
-        $page->callback('yolsa_taxonomies', [SeoMeta::class, 'taxonomyOptions']);
-
         $page->register(YOLSA_PLUGIN_DIR . 'config/settings.json', [
             'prefix' => '',
             'domain' => 'yolsa',
