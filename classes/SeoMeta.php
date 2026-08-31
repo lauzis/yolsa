@@ -324,6 +324,16 @@ class SeoMeta
      */
     public static function isNoIndex(int $postId): bool
     {
+        // Before anything anybody chose: a search engine reaching a protected
+        // post sees the password form, not the article. Indexing that means
+        // ranking an empty page, and "Always allow" cannot sensibly overrule
+        // it — there is nothing behind it to allow.
+        $post = get_post($postId);
+
+        if ($post && '' !== (string) $post->post_password) {
+            return true;
+        }
+
         $own = trim((string) get_post_meta($postId, self::ROBOTS_INDEX, true));
 
         if ('noindex' === $own) {

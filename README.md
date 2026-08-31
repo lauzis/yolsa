@@ -34,6 +34,11 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.13.0
+
+- **Password-protected posts are never indexed and never listed.** A search engine reaching one sees the password form, not the article, so indexing it means ranking an empty page. This sits ahead of every other rule — "Always allow this page" cannot overrule it, because there is nothing behind it to allow. WordPress' own sitemap does not exclude them either; this one does.
+- The sitemap's post query now runs core's own arguments, `wp_sitemaps_posts_query_args` filter included. Assembling the list per language meant building the query here, and a query standing in for core's does not get to quietly drop what core promised — including anything else hooked onto that filter.
+
 ## Version 1.12.0
 
 - **The sitemap covers every language.** WordPress builds one sitemap in one language and registers no language-prefixed route — `/en/wp-sitemap.xml` is a 404 — so on a multilingual site three languages out of four would have had no sitemap at all. The lists are now assembled by walking each active language and paginated afterwards.

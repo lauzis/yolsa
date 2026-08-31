@@ -204,16 +204,35 @@ class Sitemap
         $hidden = self::hiddenPostIds($postType);
 
         $entries = self::eachLanguage(function () use ($postType, $hidden) {
-            $query = new \WP_Query([
-                'post_type'      => $postType,
-                'post_status'    => 'publish',
-                'posts_per_page' => 5000,
-                'fields'         => 'ids',
-                'no_found_rows'  => true,
-                'orderby'        => 'ID',
-                'order'          => 'ASC',
-                'post__not_in'   => $hidden,
-            ]);
+            // Core's own arguments, filter included, so anything else hooking
+            // wp_sitemaps_posts_query_args still applies — this query stands in
+            // for core's, it does not get to ignore what core promised.
+            $args = apply_filters(
+                'wp_sitemaps_posts_query_args',
+                [
+                    'orderby'                => 'ID',
+                    'order'                  => 'ASC',
+                    'post_type'              => $postType,
+                    'post_status'            => ['publish'],
+                    'no_found_rows'          => true,
+                    'update_post_term_cache' => false,
+                    'update_post_meta_cache' => false,
+                    'ignore_sticky_posts'    => true,
+                    // Neither core nor this plugin should advertise a page that
+                    // answers with a password form.
+                    'has_password'           => false,
+                    'posts_per_page'         => 5000,
+                    'fields'                 => 'ids',
+                ],
+                $postType
+            );
+
+            $args['post__not_in'] = array_values(array_unique(array_merge(
+                isset($args['post__not_in']) ? (array) $args['post__not_in'] : [],
+                $hidden
+            )));
+
+            $query = new \WP_Query($args);
 
             $found = [];
 
