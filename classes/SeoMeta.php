@@ -263,10 +263,12 @@ class SeoMeta
         $options = [];
 
         foreach (get_post_types(['public' => true], 'objects') as $type) {
-            if ('attachment' === $type->name) {
-                continue;
-            }
-            $options[$type->name] = $type->labels->name ?: $type->name;
+            // Attachments are on the list like everything else. They used to be
+            // excluded in code, which meant the one post type most sites want
+            // hidden was the one nobody could see a setting for.
+            $options[$type->name] = 'attachment' === $type->name
+                ? __('Media pages (attachments)', 'yolsa')
+                : ($type->labels->name ?: $type->name);
         }
 
         return self::keepStoredOptions($options, 'noindex_post_types');

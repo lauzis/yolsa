@@ -34,6 +34,11 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.16.0
+
+- **Media pages are a setting rather than a rule in code.** Attachment pages were excluded from the list of choices and from the sitemap by two lines nobody could see — which made the one post type most sites want hidden the one with no visible setting. They are on the Indexing page now, ticked.
+- A one-time seed ticks the box on upgrade, so nothing changes for a site that already had them excluded: same pages hidden, same sitemap. After that the setting is whatever was last saved.
+
 ## Version 1.15.0
 
 - **Author and date archives can be hidden**, from the Indexing page. Author archives on a one-author site repeat the front page, and a search engine then has to decide which of the two is the real one; date archives rarely answer a question anybody typed.

@@ -509,10 +509,6 @@ class Sitemap
      */
     public static function filterPostTypes($postTypes)
     {
-        // Media pages carry no content of their own and are the classic way
-        // to fill a sitemap with nothing.
-        unset($postTypes['attachment']);
-
         foreach (array_keys((array) $postTypes) as $name) {
             // A hidden type is not dropped outright: a post inside it may have
             // been put back by hand, and an override that does not reach the

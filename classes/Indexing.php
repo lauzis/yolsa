@@ -35,6 +35,41 @@ class Indexing
         ]);
     }
 
+    /** Marks that the defaults below have been applied once. */
+    const SEEDED_OPTION = 'yolsa_indexing_seeded';
+
+    /**
+     * What a site that has never opened this page should already be doing.
+     *
+     * Media pages are the one post type almost nobody wants indexed: a page
+     * showing one image and nothing else, competing with the article the image
+     * belongs to. That used to be enforced in code, where it could not be seen
+     * or changed; it is a ticked box now, and a ticked box has to start ticked
+     * or upgrading would quietly put every attachment page back.
+     *
+     * Runs once. After that the setting is whatever somebody last saved,
+     * including nothing at all.
+     */
+    public static function seedDefaults(): void
+    {
+        if (get_option(self::SEEDED_OPTION)) {
+            return;
+        }
+
+        update_option(self::SEEDED_OPTION, 1, false);
+
+        if (!function_exists('carbon_set_theme_option')) {
+            return;
+        }
+
+        $current = (array) self::get('noindex_post_types', []);
+
+        if (!in_array('attachment', $current, true)) {
+            $current[] = 'attachment';
+            carbon_set_theme_option('noindex_post_types', array_values($current));
+        }
+    }
+
     /** Declares the fields. Hooked on carbon_fields_register_fields. */
     public static function register(): void
     {
