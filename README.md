@@ -34,6 +34,13 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.12.0
+
+- **The sitemap covers every language.** WordPress builds one sitemap in one language and registers no language-prefixed route — `/en/wp-sitemap.xml` is a 404 — so on a multilingual site three languages out of four would have had no sitemap at all. The lists are now assembled by walking each active language and paginated afterwards.
+- Each address is taken while its own language is active. Asked in the wrong one, WordPress answers without the language prefix, which is a URL belonging to a different post.
+- Deduplicated. An untranslated post answers with the default language's address in every language; on the site this was written for that is how the previous plugin's sitemap came to list **420 entries for 161 distinct URLs**, the same page up to four times. This one lists 420 URLs, none of them twice.
+- The assembled lists join the existing cache: rebuilt when a post is saved or deleted, when the settings are saved, and once a day.
+
 ## Version 1.11.0
 
 - **The sitemap writes to the log**, like the audit already does: one line when the list of hidden posts is built (post type, how many, how long), one when the daily rebuild finishes (totals, duration, and whether the schedule or a person triggered it), and one when a settings save clears the cache, naming what is now hidden.

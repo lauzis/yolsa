@@ -22,6 +22,9 @@ class Sitemap
     /** Transient holding the hidden ids for one post type. */
     const CACHE_PREFIX = 'yolsa_sitemap_hidden_';
 
+    /** Transient holding one assembled, all-languages url list. */
+    const URLS_PREFIX = 'yolsa_sitemap_urls_';
+
     /** The daily rebuild. */
     const CRON_HOOK = 'yolsa_sitemap_rebuild';
 
@@ -32,6 +35,16 @@ class Sitemap
         add_filter('wp_sitemaps_post_types', [self::class, 'filterPostTypes'], 20);
         add_filter('wp_sitemaps_taxonomies', [self::class, 'filterTaxonomies'], 20);
         add_filter('wp_sitemaps_posts_query_args', [self::class, 'excludeHiddenPosts'], 20, 2);
+
+        // Multilingual sites: core builds one sitemap in one language, and
+        // WordPress has no language-prefixed sitemap route — /en/wp-sitemap.xml
+        // is a 404. Left alone, three languages out of four would have no
+        // sitemap at all, so the lists are assembled across every language and
+        // paginated here instead.
+        add_filter('wp_sitemaps_posts_url_list', [self::class, 'postUrlList'], 20, 3);
+        add_filter('wp_sitemaps_posts_pre_max_num_pages', [self::class, 'postMaxPages'], 20, 2);
+        add_filter('wp_sitemaps_taxonomies_url_list', [self::class, 'taxonomyUrlList'], 20, 3);
+        add_filter('wp_sitemaps_taxonomies_pre_max_num_pages', [self::class, 'taxonomyMaxPages'], 20, 2);
 
         // A post that has just been hidden should leave the sitemap now, not
         // tomorrow — and one just published should appear.
@@ -69,6 +82,11 @@ class Sitemap
     {
         foreach (array_keys(get_post_types(['public' => true])) as $postType) {
             delete_transient(self::CACHE_PREFIX . $postType);
+            delete_transient(self::URLS_PREFIX . 'post_' . $postType);
+        }
+
+        foreach (array_keys(get_taxonomies(['public' => true])) as $taxonomy) {
+            delete_transient(self::URLS_PREFIX . 'tax_' . $taxonomy);
         }
     }
 
@@ -101,6 +119,11 @@ class Sitemap
 
         foreach (array_keys(get_post_types(['public' => true])) as $postType) {
             $counts[$postType] = count(self::hiddenPostIds($postType));
+            self::postUrls($postType);
+        }
+
+        foreach (array_keys(get_taxonomies(['public' => true])) as $taxonomy) {
+            self::taxonomyUrls($taxonomy);
         }
 
         $parts = [];
@@ -115,6 +138,221 @@ class Sitemap
             'duration' => round((microtime(true) - $started) * 1000) . 'ms',
             'trigger'  => wp_doing_cron() ? 'daily schedule' : 'called directly',
         ]);
+    }
+
+    /**
+     * The languages to walk, or a single unnamed one on a monolingual site.
+     *
+     * @return array<int, string|null>
+     */
+    public static function languages(): array
+    {
+        $languages = apply_filters('wpml_active_languages', null, ['skip_missing' => 0]);
+
+        if (!is_array($languages) || !$languages) {
+            return [null];
+        }
+
+        return array_keys($languages);
+    }
+
+    /** Runs a callback once per language, with that language active. */
+    private static function eachLanguage(callable $callback): array
+    {
+        $collected = [];
+        $languages = self::languages();
+
+        foreach ($languages as $language) {
+            if (null !== $language) {
+                do_action('wpml_switch_language', $language);
+            }
+
+            $collected[] = $callback($language);
+        }
+
+        if (count($languages) > 1) {
+            do_action('wpml_switch_language', null);
+        }
+
+        return array_merge(...$collected);
+    }
+
+    /**
+     * Every URL for one post type, in every language.
+     *
+     * The permalink has to be taken while its own language is active: asked in
+     * the wrong one, WordPress returns the address without the language prefix,
+     * which is a URL that belongs to a different post.
+     *
+     * Deduplicated on the way out. An untranslated post answers with the
+     * default language's URL in every language, which is how Yoast's sitemap on
+     * this site ends up listing 420 entries for 161 distinct addresses.
+     *
+     * @param string $postType
+     * @return array<int, array{loc:string,lastmod:string}>
+     */
+    public static function postUrls(string $postType): array
+    {
+        $key = self::URLS_PREFIX . 'post_' . $postType;
+        $cached = get_transient($key);
+
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $started = microtime(true);
+        $hidden = self::hiddenPostIds($postType);
+
+        $entries = self::eachLanguage(function () use ($postType, $hidden) {
+            $query = new \WP_Query([
+                'post_type'      => $postType,
+                'post_status'    => 'publish',
+                'posts_per_page' => 5000,
+                'fields'         => 'ids',
+                'no_found_rows'  => true,
+                'orderby'        => 'ID',
+                'order'          => 'ASC',
+                'post__not_in'   => $hidden,
+            ]);
+
+            $found = [];
+
+            foreach ($query->posts as $id) {
+                $found[] = [
+                    'loc'     => (string) get_permalink($id),
+                    'lastmod' => (string) get_post_modified_time('c', true, $id),
+                ];
+            }
+
+            return $found;
+        });
+
+        $unique = [];
+
+        foreach ($entries as $entry) {
+            if ('' !== $entry['loc']) {
+                $unique[$entry['loc']] = $entry;
+            }
+        }
+
+        $list = array_values($unique);
+
+        set_transient($key, $list, self::CACHE_TTL);
+
+        Logs::add('sitemap', 'Assembled the url list.', [
+            'post_type' => $postType,
+            'urls'      => count($list),
+            'languages' => count(self::languages()),
+            'duplicates_dropped' => count($entries) - count($list),
+            'duration'  => round((microtime(true) - $started) * 1000) . 'ms',
+        ]);
+
+        return $list;
+    }
+
+    /**
+     * Every term archive for one taxonomy, in every language.
+     *
+     * @param string $taxonomy
+     * @return array<int, array{loc:string}>
+     */
+    public static function taxonomyUrls(string $taxonomy): array
+    {
+        $key = self::URLS_PREFIX . 'tax_' . $taxonomy;
+        $cached = get_transient($key);
+
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $entries = self::eachLanguage(function () use ($taxonomy) {
+            $terms = get_terms([
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => true,
+            ]);
+
+            $found = [];
+
+            if (is_array($terms)) {
+                foreach ($terms as $term) {
+                    $link = get_term_link($term);
+
+                    if (!is_wp_error($link)) {
+                        $found[] = ['loc' => (string) $link];
+                    }
+                }
+            }
+
+            return $found;
+        });
+
+        $unique = [];
+
+        foreach ($entries as $entry) {
+            if ('' !== $entry['loc']) {
+                $unique[$entry['loc']] = $entry;
+            }
+        }
+
+        $list = array_values($unique);
+
+        set_transient($key, $list, self::CACHE_TTL);
+
+        return $list;
+    }
+
+    /**
+     * Hands core the page it asked for, out of the assembled list.
+     *
+     * @param array  $urlList
+     * @param string $postType
+     * @param int    $pageNum
+     * @return array
+     */
+    public static function postUrlList($urlList, $postType, $pageNum)
+    {
+        $all = self::postUrls((string) $postType);
+        $perPage = wp_sitemaps_get_max_urls('post');
+
+        return array_slice($all, ((int) $pageNum - 1) * $perPage, $perPage);
+    }
+
+    /**
+     * @param int|null $pre
+     * @param string   $postType
+     * @return int
+     */
+    public static function postMaxPages($pre, $postType)
+    {
+        $perPage = wp_sitemaps_get_max_urls('post');
+
+        return max(1, (int) ceil(count(self::postUrls((string) $postType)) / $perPage));
+    }
+
+    /**
+     * @param array  $urlList
+     * @param string $taxonomy
+     * @param int    $pageNum
+     * @return array
+     */
+    public static function taxonomyUrlList($urlList, $taxonomy, $pageNum)
+    {
+        $all = self::taxonomyUrls((string) $taxonomy);
+        $perPage = wp_sitemaps_get_max_urls('term');
+
+        return array_slice($all, ((int) $pageNum - 1) * $perPage, $perPage);
+    }
+
+    /**
+     * @param int|null $pre
+     * @param string   $taxonomy
+     * @return int
+     */
+    public static function taxonomyMaxPages($pre, $taxonomy)
+    {
+        $perPage = wp_sitemaps_get_max_urls('term');
+
+        return max(1, (int) ceil(count(self::taxonomyUrls((string) $taxonomy)) / $perPage));
     }
 
     /**
