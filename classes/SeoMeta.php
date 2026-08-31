@@ -153,6 +153,79 @@ class SeoMeta
     }
 
     /**
+     * What kind of thing this page is, in Open Graph's vocabulary.
+     *
+     * Only the two that mean anything here: an article, or a page. A product
+     * or a profile would need fields nobody has asked for.
+     *
+     * @param int $postId
+     * @return string
+     */
+    public static function getOgType(int $postId): string
+    {
+        return 'post' === get_post_type($postId) ? 'article' : 'website';
+    }
+
+    /**
+     * The locale to declare, in Open Graph's underscored form.
+     *
+     * Taken from the request rather than from the post: with a multilingual
+     * plugin the same code renders every translation, and the language being
+     * read is the answer.
+     *
+     * @return string
+     */
+    public static function getOgLocale(): string
+    {
+        $locale = get_locale();
+
+        // get_locale() already returns lv_LV; a bare "lv" would be a language
+        // without a territory, which Open Graph does not accept.
+        if (!preg_match('/^[a-z]{2,3}_[A-Z]{2}$/', $locale)) {
+            $locale = str_replace('-', '_', $locale);
+        }
+
+        return $locale;
+    }
+
+    /**
+     * The picture a social network should show for this post.
+     *
+     * The featured image, and nothing else. There is no separate "social image"
+     * field on purpose: a second picture to maintain is a second picture to
+     * forget, and the featured image is the one an editor has already chosen
+     * and can see. A post without one gets no og:image rather than a stand-in,
+     * because a wrong picture travels further than a missing one — the SEO box
+     * says so where the editor is looking.
+     *
+     * @param int $postId
+     * @return array{url:string,width:int,height:int,alt:string}|null
+     */
+    public static function getOgImage(int $postId): ?array
+    {
+        $attachmentId = (int) get_post_thumbnail_id($postId);
+
+        if (!$attachmentId) {
+            return null;
+        }
+
+        // Full size: the networks downscale, and their minimums (1200px wide
+        // for a large card) are above most of the intermediate sizes.
+        $image = wp_get_attachment_image_src($attachmentId, 'full');
+
+        if (!$image || empty($image[0])) {
+            return null;
+        }
+
+        return [
+            'url'    => (string) $image[0],
+            'width'  => (int) ($image[1] ?? 0),
+            'height' => (int) ($image[2] ?? 0),
+            'alt'    => trim((string) get_post_meta($attachmentId, '_wp_attachment_image_alt', true)),
+        ];
+    }
+
+    /**
      * Whether this post asks to be kept out of search results.
      *
      * Three states rather than a checkbox, because a checkbox cannot say the
@@ -227,12 +300,13 @@ class SeoMeta
         $description = self::getMetaDescription($postId);
         $ogTitle     = self::getOgTitle($postId) ?: self::getMetaTitle($postId);
         $ogDesc      = self::getOgDescription($postId) ?: $description;
+        $ogImage     = self::getOgImage($postId);
 
         // Say nothing at all unless something was actually stored for this
         // post. Emitting an og:title derived from the post title would add a
         // tag the theme very likely already provides, on every page, whether or
         // not YoLSA has ever been used on it.
-        if ('' === $description && '' === $ogTitle && '' === $ogDesc) {
+        if ('' === $description && '' === $ogTitle && '' === $ogDesc && !$ogImage) {
             return;
         }
 
@@ -251,8 +325,32 @@ class SeoMeta
             printf('<meta property="og:title" content="%s" />' . "\n", esc_attr($ogTitle));
         }
 
+        // Nothing to store for these three: the address is the permalink, the
+        // type follows the post type, and the language is whatever the request
+        // is being served in — which under a multilingual plugin is the
+        // language of the translation being read.
+        printf('<meta property="og:url" content="%s" />' . "\n", esc_url(get_permalink($postId)));
+        printf('<meta property="og:type" content="%s" />' . "\n", esc_attr(self::getOgType($postId)));
+        printf('<meta property="og:locale" content="%s" />' . "\n", esc_attr(self::getOgLocale()));
+
         if ('' !== $ogDesc) {
             printf('<meta property="og:description" content="%s" />' . "\n", esc_attr($ogDesc));
+        }
+
+        if ($ogImage) {
+            printf('<meta property="og:image" content="%s" />' . "\n", esc_url($ogImage['url']));
+
+            // Facebook and the rest lay the card out before the image has
+            // loaded when they are told the size, and reflow it when they are
+            // not.
+            if ($ogImage['width'] && $ogImage['height']) {
+                printf('<meta property="og:image:width" content="%d" />' . "\n", $ogImage['width']);
+                printf('<meta property="og:image:height" content="%d" />' . "\n", $ogImage['height']);
+            }
+
+            if ('' !== $ogImage['alt']) {
+                printf('<meta property="og:image:alt" content="%s" />' . "\n", esc_attr($ogImage['alt']));
+            }
         }
 
         echo "<!-- /YoLSA -->\n";

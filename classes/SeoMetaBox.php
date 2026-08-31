@@ -40,6 +40,41 @@ class SeoMetaBox
         return array_values($types);
     }
 
+    /**
+     * Tells the editor which picture will be shared, or that none will.
+     *
+     * @return string
+     */
+    public static function ogImageNotice(): string
+    {
+        $postId = (int) get_the_ID();
+
+        if (!$postId) {
+            return '';
+        }
+
+        $image = SeoMeta::getOgImage($postId);
+
+        if (!$image) {
+            return '<p><strong>' . esc_html__('No featured image.', 'yolsa') . '</strong> '
+                . esc_html__('Set one and it becomes the picture Facebook, Draugiem and the rest show when this page is shared. Without it they pick something from the page, or show nothing.', 'yolsa')
+                . '</p>';
+        }
+
+        $size = ($image['width'] && $image['height'])
+            ? sprintf(' (%d×%d)', $image['width'], $image['height'])
+            : '';
+
+        // 1200×630 is the size the large card is cut to; below it the networks
+        // fall back to a small square thumbnail beside the text.
+        $small = ($image['width'] && $image['width'] < 1200)
+            ? ' ' . esc_html__('It is under 1200px wide, so it may be shown as a small thumbnail rather than a large card.', 'yolsa')
+            : '';
+
+        return '<p>' . esc_html__('Shared as:', 'yolsa') . ' <code>' . esc_html(basename($image['url'])) . '</code>'
+            . esc_html($size) . ' — ' . esc_html__('the featured image.', 'yolsa') . $small . '</p>';
+    }
+
     /** Declares the box. Hooked on carbon_fields_register_fields. */
     public static function register(): void
     {
@@ -69,6 +104,12 @@ class SeoMetaBox
                     ) . '</em></p>'
                 );
         }
+
+        // The social picture is the featured image, so the only thing to say
+        // here is whether there is one — said next to the fields somebody is
+        // already editing, rather than in an audit they have to go and read.
+        $fields[] = Field::make('html', 'yolsa_og_image_notice')
+            ->set_html([self::class, 'ogImageNotice']);
 
         $fields[] = Field::make('text', 'yolsa_meta_title', __('Search engine title', 'yolsa'))
             ->set_help_text(__('Shown as the clickable heading in search results. Around 60 characters before Google truncates it. Empty uses the post title.', 'yolsa'));

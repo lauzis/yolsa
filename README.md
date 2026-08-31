@@ -34,6 +34,12 @@ setting the assistant by the instructions, but only kind of.
 
 # Change log
 
+## Version 1.6.0
+
+- **`og:image` from the featured image.** No second picture field: the featured image is the one an editor has already chosen and can see, and a second one to maintain is a second one to forget. `og:image:width`, `og:image:height` and `og:image:alt` go out with it, so a network can lay the card out before the picture has loaded.
+- A post **without** a featured image gets no `og:image` rather than a stand-in — a wrong picture travels further than a missing one. The SEO box says so instead: "No featured image. Set one and it becomes the picture Facebook, Draugiem and the rest show." When there is one, it names the file and its size, and warns when it is under 1200px wide and will be shown as a small thumbnail rather than a large card.
+- **`og:url`, `og:type` and `og:locale`** are derived too — the permalink, `article` for posts and `website` for pages, and the locale the request is being served in, which under WPML is the language of the translation being read.
+
 ## Version 1.5.0
 
 - **Keep a page out of search results.** A "Search engines" setting in the SEO box with three options: default, hide (`noindex`), or always allow. Applied through the `wp_robots` filter, so WordPress assembles one robots tag rather than two contradictory ones.
