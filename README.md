@@ -12,6 +12,7 @@
   - SEO audit shows if keywords are used in important parts of the site
   - Lists keywords and shows how often particular keyword is used and in which pages
 - Self-test page to verify core audit logic is working correctly
+- Yoast Backup page (shown while Yoast is active) copies Yoast's per-post SEO values into YoLSA's own fields
 
 # What it does
 - Scans content pages (pages/posts) and validates against SEO best practices
@@ -21,7 +22,7 @@
 
 # Prerequisites
 - Carbon Fields (installed via Composer)
-- Yoast SEO plugin (optional — if active, Yoast meta fields are used automatically; otherwise the plugin stores meta in its own `_yolsa_*` fields)
+- Yoast SEO plugin (optional — if active, Yoast meta fields are used automatically; otherwise the plugin stores meta in its own `_yolsa_*` fields). While Yoast is active, **YoLSA → Yoast Backup** copies its values into the `_yolsa_*` fields, so they survive Yoast being removed
 
 # Todos and ides
 - Get data from search tool, what are keywords that gets visits
@@ -33,6 +34,14 @@
 setting the assistant by the instructions, but only kind of.
 
 # Change log
+
+## Version 1.17.0
+
+- **A Yoast Backup page**, under the YoLSA menu while Yoast is active. One button copies every Yoast per-post value — titles, descriptions, social titles, descriptions and images, canonical URL, robots settings, breadcrumb title, cornerstone flag, schema types — on every post and page into YoLSA's own `_yolsa_*` fields. When it finishes it shows, field by field, how many values were copied, skipped or empty.
+- **Additive only.** A YoLSA field that already has a value is skipped, not overwritten, and Yoast's own values are left alone. Running it twice is harmless.
+- **Keyphrases become the page's own keyword list.** The focus keyphrase, Premium's additional keyphrases, and their synonyms as variations. A page's own list replaces the site-wide one when that page is audited, so it is only written to pages that do not have one yet.
+- **Pages can have their own keyword list.** The audit has always read a per-page `keyword_list` before the site-wide one, but nothing declared it, so nothing could write it. It now has a Keywords box on the post editor.
+- Fixed: keyword variations were never counted. The field is called `keyword_variations`; the audit was reading `kyeword_variations`. It now reads both.
 
 ## Version 1.16.0
 

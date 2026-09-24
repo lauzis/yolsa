@@ -25,7 +25,9 @@ class Helpers
         if (!empty($keyword_list)) {
             foreach ($keyword_list as $item) {
                 $keyword = $item['keyword'] ?? '';
-                $keyword_variations_acf = $item['kyeword_variations'] ?? [];
+                // The field is declared as keyword_variations; the misspelt key
+                // is what this used to read, kept for anything stored under it.
+                $keyword_variations_acf = $item['keyword_variations'] ?? $item['kyeword_variations'] ?? [];
                 $keyword_variations = [];
                 if ($keyword_variations_acf) {
                     foreach ($keyword_variations_acf as $keyword_variation) {

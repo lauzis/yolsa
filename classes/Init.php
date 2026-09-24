@@ -186,6 +186,18 @@ class Init
             [$this, 'self_test']
         );
 
+        // Only while Yoast is active: with it gone there is nothing to copy.
+        if (\SeoAudit\SeoMeta::isYoastActive()) {
+            add_submenu_page(
+                'yolsa-audit',
+                'Yoast Backup',
+                'Yoast Backup',
+                'manage_options',
+                'yolsa-yoast-backup',
+                [$this, 'yoast_backup']
+            );
+        }
+
         // Hidden while logging is switched off — there is nothing to show, and
         // the same is true of splecheh's Logs page. The page callback keeps its
         // own capability check, so this is presentation only.
@@ -244,6 +256,29 @@ class Init
         ?>
         <div class="wrap">
             <?php include(YOLSA_PLUGIN_DIR . "/templates/logs.php"); ?>
+        </div>
+        <?php
+    }
+
+    /** Admin page callback: renders the Yoast backup page and runs it on submit. */
+    public function yoast_backup(): void
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $totals = null;
+
+        if (
+            isset($_POST['action'], $_POST['yolsa_yoast_backup_nonce'])
+            && 'yoast_backup' === $_POST['action']
+            && wp_verify_nonce(sanitize_key(wp_unslash($_POST['yolsa_yoast_backup_nonce'])), 'yolsa_yoast_backup')
+        ) {
+            $totals = \SeoAudit\YoastBackup::run();
+        }
+        ?>
+        <div class="wrap">
+            <?php include(YOLSA_PLUGIN_DIR . "/templates/yoast-backup.php"); ?>
         </div>
         <?php
     }
