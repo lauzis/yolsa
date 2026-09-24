@@ -13,6 +13,25 @@ class SeoMeta
     const ROBOTS_INDEX = '_yolsa_robots_index';
     const OG_TYPE      = '_yolsa_og_type';
 
+    // Copies of the rest of Yoast's per-post fields, filled by the Yoast backup
+    // page. Nothing renders them yet; they are kept so the values survive Yoast
+    // being removed.
+    const FOCUS_KEYWORD       = '_yolsa_focus_keyword';
+    const CANONICAL           = '_yolsa_canonical';
+    const ROBOTS_NOINDEX      = '_yolsa_meta_robots_noindex';
+    const ROBOTS_NOFOLLOW     = '_yolsa_meta_robots_nofollow';
+    const ROBOTS_ADV          = '_yolsa_meta_robots_adv';
+    const BREADCRUMB_TITLE    = '_yolsa_bctitle';
+    const OG_IMAGE            = '_yolsa_og_image';
+    const OG_IMAGE_ID         = '_yolsa_og_image_id';
+    const TWITTER_TITLE       = '_yolsa_twitter_title';
+    const TWITTER_DESCRIPTION = '_yolsa_twitter_description';
+    const TWITTER_IMAGE       = '_yolsa_twitter_image';
+    const TWITTER_IMAGE_ID    = '_yolsa_twitter_image_id';
+    const IS_CORNERSTONE      = '_yolsa_is_cornerstone';
+    const SCHEMA_PAGE_TYPE    = '_yolsa_schema_page_type';
+    const SCHEMA_ARTICLE_TYPE = '_yolsa_schema_article_type';
+
     const YOAST_META_DESCRIPTION = '_yoast_wpseo_metadesc';
     const YOAST_META_TITLE       = '_yoast_wpseo_title';
     const YOAST_OG_TITLE         = '_yoast_wpseo_opengraph-title';
@@ -38,12 +57,45 @@ class SeoMeta
         'slim-seo/slim-seo.php',
     ];
 
-    private static function isYoastActive(): bool
+    public static function isYoastActive(): bool
     {
         if (!function_exists('is_plugin_active')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
         return is_plugin_active('wordpress-seo/wp-seo.php');
+    }
+
+    /**
+     * Every Yoast per-post key, paired with the YoLSA key it is backed up to.
+     *
+     * The keyphrases are not here: they become the post's local keyword list,
+     * which is a Carbon Fields complex field rather than a single string.
+     *
+     * @return array<string, string> Yoast key => YoLSA key.
+     */
+    public static function getYoastFieldMap(): array
+    {
+        return [
+            self::YOAST_META_TITLE                 => self::META_TITLE,
+            self::YOAST_META_DESCRIPTION           => self::META_DESCRIPTION,
+            self::YOAST_OG_TITLE                   => self::OG_TITLE,
+            self::YOAST_OG_DESCRIPTION             => self::OG_DESCRIPTION,
+            '_yoast_wpseo_focuskw'                 => self::FOCUS_KEYWORD,
+            '_yoast_wpseo_canonical'               => self::CANONICAL,
+            self::YOAST_NOINDEX                    => self::ROBOTS_NOINDEX,
+            '_yoast_wpseo_meta-robots-nofollow'    => self::ROBOTS_NOFOLLOW,
+            '_yoast_wpseo_meta-robots-adv'         => self::ROBOTS_ADV,
+            '_yoast_wpseo_bctitle'                 => self::BREADCRUMB_TITLE,
+            '_yoast_wpseo_opengraph-image'         => self::OG_IMAGE,
+            '_yoast_wpseo_opengraph-image-id'      => self::OG_IMAGE_ID,
+            '_yoast_wpseo_twitter-title'           => self::TWITTER_TITLE,
+            '_yoast_wpseo_twitter-description'     => self::TWITTER_DESCRIPTION,
+            '_yoast_wpseo_twitter-image'           => self::TWITTER_IMAGE,
+            '_yoast_wpseo_twitter-image-id'        => self::TWITTER_IMAGE_ID,
+            '_yoast_wpseo_is_cornerstone'          => self::IS_CORNERSTONE,
+            '_yoast_wpseo_schema_page_type'        => self::SCHEMA_PAGE_TYPE,
+            '_yoast_wpseo_schema_article_type'     => self::SCHEMA_ARTICLE_TYPE,
+        ];
     }
 
     public static function getMetaDescriptionKey(): string
@@ -633,6 +685,14 @@ class SeoMeta
             register_post_meta($post_type, self::OG_DESCRIPTION, $args);
             register_post_meta($post_type, self::ROBOTS_INDEX, $args);
             register_post_meta($post_type, self::OG_TYPE, $args);
+
+            // The four above are already registered; this adds the rest of the
+            // backup keys the same way.
+            foreach (self::getYoastFieldMap() as $own) {
+                if (!registered_meta_key_exists('post', $own, $post_type)) {
+                    register_post_meta($post_type, $own, $args);
+                }
+            }
         }
     }
 }

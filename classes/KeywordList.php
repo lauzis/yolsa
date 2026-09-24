@@ -49,4 +49,37 @@ class KeywordList
 
         $page->render();
     }
+
+    /**
+     * Declares the per-post keyword list. Hooked on carbon_fields_register_fields.
+     *
+     * `Helpers::get_keywords_arr()` has always read a post's own `keyword_list`
+     * ahead of the global one, but no box declared it, so nothing could write
+     * it — Carbon Fields only saves fields it knows about. Same shape as the
+     * global list, so the audit reads both the same way.
+     */
+    public static function registerPostMeta(): void
+    {
+        $types = SeoMetaBox::postTypes();
+
+        if (!$types) {
+            return;
+        }
+
+        \Carbon_Fields\Container::make('post_meta', __('Keywords', 'yolsa'))
+            ->where('post_type', 'IN', $types)
+            ->set_context('normal')
+            ->set_priority('low')
+            ->add_fields([
+                \Carbon_Fields\Field::make('complex', 'keyword_list', __('Keyword list for this page', 'yolsa'))
+                    ->set_help_text(__('Replaces the site-wide keyword list when this page is audited. Empty uses the site-wide list.', 'yolsa'))
+                    ->add_fields([
+                        \Carbon_Fields\Field::make('text', 'keyword', __('Keyword', 'yolsa')),
+                        \Carbon_Fields\Field::make('complex', 'keyword_variations', __('Variations', 'yolsa'))
+                            ->add_fields([
+                                \Carbon_Fields\Field::make('text', 'keyword_variation', __('Variation', 'yolsa')),
+                            ]),
+                    ]),
+            ]);
+    }
 }
